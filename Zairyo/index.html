@@ -8,362 +8,387 @@
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
-  :root {
-    --brand: #f18200;
-    --brand-light: #fff4e6;
-    --brand-dark: #c96800;
-    --text: #1a1a1a;
-    --text-sub: #666;
-    --border: #e0e0e0;
-    --bg: #fafafa;
-    --bg-white: #ffffff;
-    --success: #2d8a4e;
-    --warning: #d97706;
-    --danger: #dc2626;
-    --radius: 10px;
-    --shadow: 0 2px 12px rgba(0,0,0,0.08);
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); font-size: 15px; }
+:root {
+  --brand:#f18200; --brand-light:#fff4e6; --brand-dark:#c96800;
+  --text:#1a1a1a; --text-sub:#666; --border:#e0e0e0;
+  --bg:#f5f5f5; --white:#ffffff;
+  --green:#16a34a; --green-light:#f0fdf4;
+  --red:#dc2626; --red-light:#fef2f2;
+  --yellow:#d97706; --yellow-light:#fffbeb;
+  --radius:10px; --shadow:0 2px 12px rgba(0,0,0,0.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);font-size:15px;}
 
-  /* ヘッダー */
-  .header { background: var(--brand); color: #fff; padding: 14px 16px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(241,130,0,0.3); }
-  .header h1 { font-size: 17px; font-weight: 700; letter-spacing: 0.02em; }
-  .header p { font-size: 11px; opacity: 0.85; margin-top: 2px; }
+/* ヘッダー */
+.hdr{background:var(--brand);color:#fff;padding:13px 16px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(241,130,0,.3);}
+.hdr h1{font-size:16px;font-weight:700;}
+.hdr p{font-size:11px;opacity:.85;margin-top:2px;}
 
-  /* メインタブ */
-  .main-tabs { display: flex; background: #fff; border-bottom: 2px solid var(--border); overflow-x: auto; }
-  .main-tab { flex: 1; min-width: 80px; padding: 12px 8px; text-align: center; font-size: 13px; font-weight: 600; color: var(--text-sub); cursor: pointer; border: none; background: none; white-space: nowrap; border-bottom: 3px solid transparent; transition: all 0.2s; }
-  .main-tab.active { color: var(--brand); border-bottom-color: var(--brand); }
+/* タブ */
+.tabs{display:flex;background:#fff;border-bottom:2px solid var(--border);}
+.tab{flex:1;padding:11px 6px;text-align:center;font-size:13px;font-weight:600;color:var(--text-sub);cursor:pointer;border:none;background:none;border-bottom:3px solid transparent;transition:.2s;}
+.tab.on{color:var(--brand);border-bottom-color:var(--brand);}
 
-  /* コンテンツ */
-  .content { max-width: 640px; margin: 0 auto; padding: 16px; }
+/* コンテンツ */
+.wrap{max-width:680px;margin:0 auto;padding:14px;}
 
-  /* カード */
-  .card { background: var(--bg-white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; margin-bottom: 14px; }
-  .card-title { font-size: 13px; font-weight: 700; color: var(--brand); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
-  .card-title::before { content: ''; display: inline-block; width: 4px; height: 16px; background: var(--brand); border-radius: 2px; }
+/* カード */
+.card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:15px;margin-bottom:12px;}
+.ctitle{font-size:13px;font-weight:700;color:var(--brand);margin-bottom:11px;display:flex;align-items:center;gap:6px;}
+.ctitle::before{content:'';display:inline-block;width:4px;height:15px;background:var(--brand);border-radius:2px;}
 
-  /* 入力フォーム */
-  .form-row { margin-bottom: 12px; }
-  .form-label { font-size: 12px; font-weight: 600; color: var(--text-sub); margin-bottom: 5px; display: block; }
-  .form-input { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 15px; font-family: inherit; transition: border-color 0.2s; background: #fff; }
-  .form-input:focus { outline: none; border-color: var(--brand); }
-  .form-row-inline { display: flex; gap: 10px; }
-  .form-row-inline .form-row { flex: 1; }
+/* フォーム */
+.flabel{font-size:12px;font-weight:600;color:var(--text-sub);margin-bottom:4px;display:block;}
+.finput{width:100%;padding:9px 11px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;transition:.2s;background:#fff;}
+.finput:focus{outline:none;border-color:var(--brand);}
+.frow{margin-bottom:11px;}
+.frow-2{display:flex;gap:10px;}
+.frow-2 .frow{flex:1;}
 
-  /* 面積入力 */
-  .area-input-wrap { display: flex; align-items: center; gap: 8px; }
-  .area-input { font-size: 22px; font-weight: 700; text-align: right; width: 140px; padding: 10px 12px; border: 2px solid var(--border); border-radius: 8px; color: var(--brand); }
-  .area-input:focus { outline: none; border-color: var(--brand); }
-  .area-unit { font-size: 18px; font-weight: 600; color: var(--text-sub); }
+/* 面積入力 */
+.area-wrap{display:flex;align-items:center;gap:8px;}
+.area-in{font-size:24px;font-weight:700;text-align:right;width:150px;padding:9px 12px;border:2px solid var(--border);border-radius:8px;color:var(--brand);}
+.area-in:focus{outline:none;border-color:var(--brand);}
 
-  /* クリヤー選択 */
-  .radio-group { display: flex; gap: 8px; flex-wrap: wrap; }
-  .radio-btn { flex: 1; min-width: 70px; padding: 9px 6px; border: 1.5px solid var(--border); border-radius: 8px; text-align: center; font-size: 13px; font-weight: 600; cursor: pointer; background: #fff; color: var(--text-sub); transition: all 0.2s; }
-  .radio-btn.selected { border-color: var(--brand); background: var(--brand-light); color: var(--brand); }
+/* ラジオボタン群 */
+.rbg{display:flex;gap:7px;flex-wrap:wrap;}
+.rb{flex:1;min-width:65px;padding:9px 6px;border:1.5px solid var(--border);border-radius:8px;text-align:center;font-size:13px;font-weight:600;cursor:pointer;background:#fff;color:var(--text-sub);transition:.2s;}
+.rb.on{border-color:var(--brand);background:var(--brand-light);color:var(--brand);}
 
-  /* 警告バナー */
-  .warn-banner { background: #fff8e1; border: 1px solid #fbbf24; border-radius: 8px; padding: 10px 12px; font-size: 12px; color: #92400e; margin-top: 10px; display: flex; gap: 8px; align-items: flex-start; }
-  .warn-banner .icon { flex-shrink: 0; }
+/* 警告 */
+.warn{background:var(--yellow-light);border:1px solid #fbbf24;border-radius:8px;padding:9px 11px;font-size:12px;color:#92400e;margin-top:8px;display:flex;gap:7px;}
 
-  /* 計算結果 */
-  .result-section { margin-bottom: 10px; }
-  .result-step { background: #f9f9f9; border-radius: 8px; padding: 12px; margin-bottom: 8px; }
-  .result-step-title { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
-  .result-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); }
-  .result-row:last-child { border-bottom: none; }
-  .result-name { font-size: 14px; color: var(--text); flex: 1; }
-  .result-qty { font-size: 14px; font-weight: 600; color: var(--text); min-width: 60px; text-align: right; margin-right: 12px; }
-  .result-price { font-size: 14px; font-weight: 600; color: var(--text); min-width: 80px; text-align: right; }
+/* 材料カード */
+.mat-card{border:1.5px solid var(--border);border-radius:9px;margin-bottom:9px;overflow:hidden;}
+.mat-head{display:flex;align-items:center;padding:11px 13px;gap:10px;background:#fafafa;}
+.mat-name{flex:1;}
+.mat-name .name{font-size:14px;font-weight:600;}
+.mat-name .size{font-size:11px;color:var(--text-sub);margin-top:1px;}
+.mat-name .cov{font-size:11px;color:var(--brand);margin-top:2px;font-weight:600;}
+.mat-ctrl{display:flex;align-items:center;gap:6px;}
+.qbtn{width:28px;height:28px;border:1.5px solid var(--border);border-radius:6px;background:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-sub);font-weight:700;flex-shrink:0;}
+.qbtn:active{background:var(--brand-light);}
+.qinput{font-size:16px;font-weight:700;width:44px;text-align:center;border:1.5px solid var(--brand);border-radius:6px;padding:4px 2px;color:var(--brand);background:#fff;font-family:inherit;}
+.qinput:focus{outline:none;}
+.qunit{font-size:12px;color:var(--text-sub);flex-shrink:0;}
+.mat-price{font-size:14px;font-weight:700;min-width:72px;text-align:right;flex-shrink:0;}
 
-  /* 手動調整 */
-  .qty-adjust { display: flex; align-items: center; gap: 6px; }
-  .qty-btn { width: 26px; height: 26px; border: 1.5px solid var(--border); border-radius: 6px; background: #fff; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-sub); font-weight: 700; }
-  .qty-btn:active { background: var(--brand-light); }
-  .qty-num { font-size: 15px; font-weight: 700; min-width: 28px; text-align: center; color: var(--brand); }
+/* カバレッジバー */
+.cov-bar-wrap{padding:6px 13px 10px;background:#fafafa;border-top:1px solid var(--border);}
+.cov-label{font-size:11px;color:var(--text-sub);margin-bottom:4px;display:flex;justify-content:space-between;}
+.cov-bar{height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden;}
+.cov-bar-fill{height:100%;background:var(--brand);border-radius:3px;transition:.3s;}
+.cov-bar-fill.over{background:var(--green);}
 
-  /* 合計ボックス */
-  .total-box { background: var(--text); color: #fff; border-radius: var(--radius); padding: 18px; margin-bottom: 14px; }
-  .total-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-  .total-label { font-size: 13px; opacity: 0.75; }
-  .total-value { font-size: 18px; font-weight: 700; }
-  .total-main { font-size: 26px; font-weight: 800; color: var(--brand); }
-  .total-tax-toggle { display: flex; gap: 6px; margin-bottom: 14px; }
-  .tax-btn { flex: 1; padding: 8px; border: 1.5px solid #444; border-radius: 8px; background: transparent; color: #aaa; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-  .tax-btn.active { border-color: var(--brand); background: var(--brand); color: #fff; }
-  .sqm-price { font-size: 13px; opacity: 0.7; text-align: right; margin-top: 6px; }
+/* 余り試算 */
+.surplus-box{margin:0 13px 11px;background:var(--green-light);border:1px solid #bbf7d0;border-radius:8px;padding:10px 12px;}
+.surplus-title{font-size:11px;font-weight:700;color:var(--green);margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;}
+.surplus-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px dashed #d1fae5;}
+.surplus-row:last-of-type{border-bottom:none;}
+.surplus-label{color:var(--text-sub);}
+.surplus-val{font-weight:600;}
+.surplus-val.green{color:var(--green);}
+.surplus-val.gray{color:#888;}
+.add-stock-btn{margin-top:8px;width:100%;padding:7px;border:1.5px solid var(--green);border-radius:7px;background:#fff;color:var(--green);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;}
+.add-stock-btn:active{background:var(--green-light);}
 
-  /* ボタン群 */
-  .btn-group { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
-  .btn { flex: 1; min-width: 100px; padding: 13px 10px; border: none; border-radius: var(--radius); font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
-  .btn-primary { background: var(--brand); color: #fff; }
-  .btn-primary:active { background: var(--brand-dark); }
-  .btn-secondary { background: #fff; color: var(--brand); border: 2px solid var(--brand); }
-  .btn-secondary:active { background: var(--brand-light); }
-  .btn-gray { background: #f0f0f0; color: var(--text-sub); }
-  .btn-gray:active { background: #e0e0e0; }
+/* 合計ボックス */
+.total-box{background:var(--text);color:#fff;border-radius:var(--radius);padding:17px;margin-bottom:12px;}
+.ttax{display:flex;gap:6px;margin-bottom:13px;}
+.ttax-btn{flex:1;padding:7px;border:1.5px solid #444;border-radius:8px;background:transparent;color:#aaa;font-size:13px;font-weight:600;cursor:pointer;}
+.ttax-btn.on{border-color:var(--brand);background:var(--brand);color:#fff;}
+.trow{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.trow .lbl{font-size:13px;opacity:.7;}
+.trow .val{font-size:15px;font-weight:700;}
+.trow .val.big{font-size:25px;font-weight:800;color:var(--brand);}
+.trow .val.green{color:#4ade80;}
+.trow .val.muted{opacity:.6;}
+.tdiv{border-top:1px solid #444;margin:10px 0;}
+.tsqm{font-size:12px;opacity:.6;text-align:right;margin-top:5px;}
+.surplus-summary{background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);border-radius:8px;padding:10px;margin:10px 0;}
+.surplus-summary .row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;}
+.surplus-summary .row:last-child{margin-bottom:0;}
+.surplus-summary .lbl{opacity:.8;}
+.surplus-summary .val{font-weight:700;color:#4ade80;}
 
-  /* 折り畳みパネル */
-  .collapse-panel { background: #fff; border: 1.5px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; overflow: hidden; }
-  .collapse-header { display: flex; justify-content: space-between; align-items: center; padding: 13px 16px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--text); }
-  .collapse-header .arrow { transition: transform 0.2s; color: var(--brand); font-size: 12px; }
-  .collapse-header .arrow.open { transform: rotate(180deg); }
-  .collapse-body { padding: 0 16px 16px; }
+/* ボタン */
+.btngrp{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:12px;}
+.btn{flex:1;min-width:90px;padding:12px 8px;border:none;border-radius:var(--radius);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px;transition:.2s;}
+.btn-p{background:var(--brand);color:#fff;}
+.btn-p:active{background:var(--brand-dark);}
+.btn-s{background:#fff;color:var(--brand);border:2px solid var(--brand);}
+.btn-s:active{background:var(--brand-light);}
+.btn-g{background:#f0f0f0;color:var(--text-sub);}
+.btn-g:active{background:#e0e0e0;}
 
-  /* 単価表 */
-  .price-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .price-table th { background: var(--brand-light); color: var(--brand-dark); font-weight: 700; padding: 8px 10px; text-align: left; border-bottom: 2px solid var(--brand); }
-  .price-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
-  .price-table tr:last-child td { border-bottom: none; }
-  .price-table tr:nth-child(even) td { background: #fafafa; }
-  .section-divider { font-size: 12px; font-weight: 700; color: var(--text-sub); padding: 10px 10px 4px; background: #f5f5f5; letter-spacing: 0.05em; }
+/* 折り畳み */
+.coll{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);margin-bottom:9px;overflow:hidden;}
+.coll-hd{display:flex;justify-content:space-between;align-items:center;padding:12px 15px;cursor:pointer;font-size:14px;font-weight:600;}
+.coll-arr{transition:.2s;color:var(--brand);font-size:12px;}
+.coll-arr.op{transform:rotate(180deg);}
+.coll-bd{padding:0 15px 14px;}
 
-  /* 施工要領 */
-  .manual-section { margin-bottom: 14px; }
-  .manual-title { font-size: 13px; font-weight: 700; color: var(--brand-dark); margin-bottom: 6px; }
-  .manual-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 8px; }
-  .manual-table th { background: #f0f0f0; padding: 6px 8px; text-align: left; font-weight: 600; }
-  .manual-table td { padding: 6px 8px; border-bottom: 1px solid var(--border); }
-  .manual-note { font-size: 12px; color: var(--text-sub); line-height: 1.6; background: #f9f9f9; border-radius: 6px; padding: 10px; }
-  .manual-note li { margin-left: 16px; margin-bottom: 4px; }
+/* 単価表 */
+.ptbl{width:100%;border-collapse:collapse;font-size:13px;}
+.ptbl th{background:var(--brand-light);color:var(--brand-dark);font-weight:700;padding:7px 9px;text-align:left;border-bottom:2px solid var(--brand);}
+.ptbl td{padding:7px 9px;border-bottom:1px solid var(--border);}
+.ptbl tr:last-child td{border-bottom:none;}
+.ptbl tr:nth-child(even) td{background:#fafafa;}
 
-  /* 発注書モーダル */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: flex; align-items: flex-end; justify-content: center; }
-  .modal { background: #fff; border-radius: 16px 16px 0 0; width: 100%; max-width: 640px; max-height: 92vh; overflow-y: auto; padding: 20px 16px; }
-  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-  .modal-title { font-size: 17px; font-weight: 700; }
-  .modal-close { font-size: 24px; cursor: pointer; color: var(--text-sub); background: none; border: none; }
+/* 在庫 */
+.stock-item{background:#fff;border:1.5px solid var(--border);border-radius:9px;padding:12px;margin-bottom:9px;}
+.stock-item-hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+.stock-item-name{font-weight:700;font-size:14px;}
+.stock-item-size{font-size:11px;color:var(--text-sub);margin-top:2px;}
+.stock-del{background:none;border:1.5px solid #fecaca;border-radius:6px;color:var(--red);font-size:12px;padding:4px 8px;cursor:pointer;}
+.stock-metrics{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;}
+.stock-metric{background:#f9f9f9;border-radius:6px;padding:7px 9px;}
+.stock-metric .lbl{font-size:10px;color:var(--text-sub);}
+.stock-metric .val{font-size:14px;font-weight:700;color:var(--green);}
+.stock-sqm-edit{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.stock-sqm-in{width:80px;padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:14px;text-align:right;}
+.stock-memo{width:100%;padding:7px 9px;border:1.5px solid var(--border);border-radius:6px;font-size:12px;font-family:inherit;resize:none;}
+.stock-from{font-size:11px;color:var(--text-sub);margin-top:4px;}
+.stock-total{background:var(--green-light);border:1px solid #bbf7d0;border-radius:9px;padding:12px;margin-top:4px;}
+.stock-total .row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;}
+.stock-total .row:last-child{margin-bottom:0;}
+.empty{text-align:center;padding:28px 14px;color:var(--text-sub);}
+.empty .ico{font-size:32px;margin-bottom:7px;}
 
-  /* 発注書プレビュー */
-  .order-doc { border: 2px solid var(--text); border-radius: 8px; padding: 16px; font-size: 13px; }
-  .order-doc h2 { text-align: center; font-size: 16px; margin-bottom: 12px; border-bottom: 2px solid var(--text); padding-bottom: 8px; }
-  .order-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px; font-size: 12px; }
-  .order-meta-item { border: 1px solid #ccc; padding: 6px 8px; border-radius: 4px; }
-  .order-meta-label { font-size: 10px; color: var(--text-sub); }
-  .order-meta-value { font-weight: 600; }
-  .order-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 10px; }
-  .order-table th { background: #333; color: #fff; padding: 6px 8px; text-align: left; }
-  .order-table td { padding: 7px 8px; border-bottom: 1px solid #ddd; }
-  .order-table tr:nth-child(even) td { background: #f9f9f9; }
-  .order-note-box { border: 1px solid #ccc; border-radius: 6px; padding: 10px; min-height: 60px; font-size: 12px; color: var(--text-sub); }
-  .order-total-area { background: #f5f5f5; border-radius: 6px; padding: 10px; text-align: right; font-size: 14px; font-weight: 700; margin-top: 8px; }
+/* 施工要領 詳細版 */
+.man-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
+.man-tab{padding:7px 14px;border:1.5px solid var(--border);border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;background:#fff;color:var(--text-sub);transition:.2s;}
+.man-tab.on{border-color:var(--brand);background:var(--brand-light);color:var(--brand);}
+.man-section{margin-bottom:20px;}
+.man-h1{font-size:15px;font-weight:700;color:var(--text);border-left:4px solid var(--brand);padding-left:10px;margin-bottom:10px;}
+.man-h2{font-size:13px;font-weight:700;color:var(--brand-dark);margin:12px 0 6px;display:flex;align-items:center;gap:6px;}
+.man-h2::before{content:'▶';font-size:10px;color:var(--brand);}
+.flow{display:flex;flex-direction:column;gap:0;margin:10px 0;}
+.flow-step{display:flex;align-items:stretch;gap:0;}
+.flow-num{width:32px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;}
+.flow-circle{width:28px;height:28px;border-radius:50%;background:var(--brand);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.flow-line{width:2px;background:var(--brand);opacity:.3;flex:1;margin:0 auto;}
+.flow-body{flex:1;padding:0 0 14px 10px;}
+.flow-title{font-size:13px;font-weight:700;margin-bottom:4px;}
+.flow-desc{font-size:12px;color:var(--text-sub);line-height:1.6;}
+.flow-tag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:700;margin-bottom:5px;}
+.flow-tag.mat{background:#fff4e6;color:var(--brand);}
+.flow-tag.dry{background:#e0f2fe;color:#0369a1;}
+.flow-tag.warn{background:#fef2f2;color:var(--red);}
+.mix-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:11px 13px;margin:8px 0;}
+.mix-title{font-size:12px;font-weight:700;color:#475569;margin-bottom:8px;}
+.mix-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.mix-row:last-child{margin-bottom:0;}
+.mix-name{flex:1;font-size:13px;}
+.mix-bar-wrap{width:100px;flex-shrink:0;}
+.mix-bar{height:8px;border-radius:4px;background:var(--brand);opacity:.8;}
+.mix-amt{font-size:12px;font-weight:700;color:var(--brand);min-width:65px;text-align:right;}
+.mix-note{font-size:11px;color:var(--text-sub);margin-top:6px;font-style:italic;}
+.mix-area{background:var(--brand);color:#fff;border-radius:6px;padding:5px 10px;font-size:12px;font-weight:700;text-align:center;margin-top:8px;}
+.caution{background:#fef2f2;border-left:4px solid var(--red);border-radius:0 8px 8px 0;padding:10px 12px;margin:8px 0;}
+.caution-title{font-size:12px;font-weight:700;color:var(--red);margin-bottom:5px;}
+.caution li{font-size:12px;color:#7f1d1d;line-height:1.7;margin-left:16px;}
+.point{background:#eff6ff;border-left:4px solid #3b82f6;border-radius:0 8px 8px 0;padding:10px 12px;margin:8px 0;}
+.point li{font-size:12px;color:#1e3a5f;line-height:1.7;margin-left:16px;}
+.spec-tbl{width:100%;border-collapse:collapse;font-size:12px;margin:8px 0;}
+.spec-tbl th{background:#334155;color:#fff;padding:7px 9px;text-align:left;font-size:11px;}
+.spec-tbl td{padding:7px 9px;border-bottom:1px solid var(--border);}
+.spec-tbl tr:nth-child(even) td{background:#f8fafc;}
+.dry-badge{display:inline-flex;align-items:center;gap:4px;background:#e0f2fe;color:#0369a1;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:700;margin-left:6px;}
+.mtbl{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:8px;}
+.mtbl th{background:#f0f0f0;padding:5px 7px;text-align:left;font-weight:600;}
+.mtbl td{padding:5px 7px;border-bottom:1px solid var(--border);}
+.mnote{font-size:12px;color:var(--text-sub);line-height:1.6;background:#f9f9f9;border-radius:6px;padding:9px;}
+.mnote li{margin-left:16px;margin-bottom:3px;}
+.msec-title{font-size:13px;font-weight:700;color:var(--brand-dark);margin:10px 0 5px;}
 
-  /* 保存リスト */
-  .save-list { display: flex; flex-direction: column; gap: 8px; }
-  .save-item { background: #fff; border: 1.5px solid var(--border); border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center; }
-  .save-item-info { flex: 1; }
-  .save-item-name { font-weight: 600; font-size: 14px; }
-  .save-item-meta { font-size: 12px; color: var(--text-sub); margin-top: 2px; }
-  .save-item-actions { display: flex; gap: 6px; }
-  .icon-btn { padding: 6px 10px; border: 1.5px solid var(--border); border-radius: 6px; background: #fff; font-size: 12px; cursor: pointer; color: var(--text-sub); }
-  .icon-btn.danger { border-color: #fecaca; color: var(--danger); }
+/* モーダル */
+.mo-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:flex-end;justify-content:center;}
+.mo{background:#fff;border-radius:16px 16px 0 0;width:100%;max-width:680px;max-height:92vh;overflow-y:auto;padding:18px 15px;}
+.mo-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.mo-title{font-size:16px;font-weight:700;}
+.mo-close{font-size:24px;cursor:pointer;color:var(--text-sub);background:none;border:none;}
 
-  /* 空状態 */
-  .empty-state { text-align: center; padding: 30px 16px; color: var(--text-sub); }
-  .empty-state .icon { font-size: 36px; margin-bottom: 8px; }
+/* 発注書 */
+.odoc{border:2px solid var(--text);border-radius:8px;padding:15px;font-size:13px;}
+.odoc h2{text-align:center;font-size:15px;margin-bottom:10px;border-bottom:2px solid var(--text);padding-bottom:7px;}
+.ometa{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:11px;}
+.ometa-item{border:1px solid #ccc;padding:5px 7px;border-radius:4px;}
+.ometa-lbl{font-size:10px;color:var(--text-sub);}
+.ometa-val{font-weight:600;font-size:13px;}
+.otbl{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:9px;}
+.otbl th{background:#333;color:#fff;padding:6px 7px;text-align:left;}
+.otbl td{padding:6px 7px;border-bottom:1px solid #ddd;}
+.otbl tr:nth-child(even) td{background:#f9f9f9;}
+.ototal{background:#f5f5f5;border-radius:6px;padding:9px;text-align:right;font-size:14px;font-weight:700;margin-top:7px;}
+.onote{border:1px solid #ccc;border-radius:6px;padding:9px;min-height:55px;font-size:12px;color:var(--text-sub);}
 
-  /* 印刷用 */
-  @media print {
-    .no-print { display: none !important; }
-    .modal-overlay { position: static; background: none; }
-    .modal { max-height: none; border-radius: 0; padding: 0; }
-    body { background: #fff; }
-  }
-
-  @media (min-width: 600px) {
-    .content { padding: 20px; }
-    .area-input { width: 180px; font-size: 28px; }
-  }
+@media print{
+  .no-print{display:none!important;}
+  .mo-ov{position:static;background:none;}
+  .mo{max-height:none;border-radius:0;padding:0;}
+  body{background:#fff;}
+}
+@media(min-width:600px){
+  .wrap{padding:18px;}
+  .area-in{width:180px;font-size:28px;}
+}
 </style>
 </head>
 <body>
 <div id="root"></div>
-
 <script type="text/babel">
-const { useState, useCallback, useMemo } = React;
+const {useState,useMemo,useCallback} = React;
 
 // ============================================================
-// 材料マスターデータ
+// 材料マスター（coverage = 1単位あたりの施工可能面積㎡）
 // ============================================================
-const MATERIALS = {
-  // 内装
-  pate:      { name: 'FCクイックパテ',       unit: '袋', size: '3.5kg/袋',    price: 1460,  coverage: 62.5 },
-  tape:      { name: 'ファイバーテープ',      unit: '巻', size: '50mm×90m/巻', price: 1770,  coverage: 60 },
-  under:     { name: 'ベストアンダー',        unit: '袋', size: '3.3kg/袋',    price: 1770,  coverage: 3.3 },
-  mwMain:    { name: 'MURA WALL 主材',       unit: '袋', size: '3.875kg/セット',price: 3960, coverage: 4.5 },
-  mwColor:   { name: 'MURA WALL カラー',     unit: '袋', size: '100g/袋',      price: 780,  coverage: null },
-  mwFin:     { name: 'MURA WALL フィニッシュ',unit: '缶', size: '3kg/缶',       price: 9720, coverage: 12.5 },
-  // 外装
-  sealerS:   { name: 'シーラーW',            unit: '缶', size: '4kg/缶',       price: 4320,  coverage: 33.3 },
-  sealerL:   { name: 'シーラーW',            unit: '缶', size: '15kg/缶',      price: 11930, coverage: 125 },
-  exMain:    { name: 'MURA WALL EX 主材',    unit: '袋', size: '5.2kg/セット', price: 4200,  coverage: 4.5 },
-  exColor:   { name: 'MURA WALL EX カラー',  unit: '袋', size: '100g/袋',      price: 780,  coverage: null },
-  exFin:     { name: 'MURA WALL EX フィニッシュ',unit:'缶',size:'3kg/缶',      price:10320,  coverage: 10 },
-  // クリヤー（共通）
-  clearGlossS:  { name: 'MURA WALL クリヤー 艶あり', unit: '缶', size: '2kg/缶',  price: 2880,  coverage: 10 },
-  clearGlossL:  { name: 'MURA WALL クリヤー 艶あり', unit: '缶', size: '16kg/缶', price: 20520, coverage: 80 },
-  clearMatteS:  { name: 'MURA WALL クリヤー 艶消し', unit: '缶', size: '2kg/缶',  price: 3600,  coverage: 10 },
-  clearMatteL:  { name: 'MURA WALL クリヤー 艶消し', unit: '缶', size: '16kg/缶', price: 26520, coverage: 80 },
+const MAT = {
+  pate:        {name:'FCクイックパテ',      unit:'袋',size:'3.5kg/袋',    price:1460,  coverage:62.5, noSurplus:false},
+  tape:        {name:'ファイバーテープ',     unit:'巻',size:'50mm×90m/巻',price:1770,  coverage:60,   noSurplus:false},
+  under:       {name:'ベストアンダー',       unit:'袋',size:'3.3kg/袋',    price:1770,  coverage:3.3,  noSurplus:false},
+  mwMain:      {name:'MURA WALL 主材',      unit:'袋',size:'3.875kg/セット',price:3960, coverage:4.5,  noSurplus:false},
+  mwColor:     {name:'MURA WALL カラー',    unit:'袋',size:'100g/袋',      price:780,   coverage:null, noSurplus:true},
+  mwFin:       {name:'MURA WALL フィニッシュ',unit:'缶',size:'3kg/缶',    price:9720,  coverage:12.5, noSurplus:false},
+  sealerS:     {name:'シーラーW',           unit:'缶',size:'4kg/缶',       price:4320,  coverage:33.3, noSurplus:false},
+  sealerL:     {name:'シーラーW',           unit:'缶',size:'15kg/缶',      price:11930, coverage:125,  noSurplus:false},
+  exMain:      {name:'MURA WALL EX 主材',   unit:'袋',size:'5.2kg/セット', price:4200,  coverage:4.5,  noSurplus:false},
+  exColor:     {name:'MURA WALL EX カラー', unit:'袋',size:'100g/袋',      price:780,   coverage:null, noSurplus:true},
+  exFin:       {name:'MURA WALL EX フィニッシュ',unit:'缶',size:'3kg/缶', price:10320, coverage:10,   noSurplus:false},
+  clearGlossS: {name:'クリヤー 艶あり',     unit:'缶',size:'2kg/缶',       price:2880,  coverage:10,   noSurplus:false},
+  clearGlossL: {name:'クリヤー 艶あり',     unit:'缶',size:'16kg/缶',      price:20520, coverage:80,   noSurplus:false},
+  clearMatteS: {name:'クリヤー 艶消し',     unit:'缶',size:'2kg/缶',       price:3600,  coverage:10,   noSurplus:false},
+  clearMatteL: {name:'クリヤー 艶消し',     unit:'缶',size:'16kg/缶',      price:26520, coverage:80,   noSurplus:false},
 };
 
 // ============================================================
 // 計算ロジック
 // ============================================================
-function calcClear(area, type) {
-  if (type === 'none') return [];
-  const sKey = type === 'gloss' ? 'clearGlossS' : 'clearMatteS';
-  const lKey = type === 'gloss' ? 'clearGlossL' : 'clearMatteL';
-  const mS = MATERIALS[sKey], mL = MATERIALS[lKey];
-  const large = Math.floor(area / 80);
-  const remain = area - large * 80;
-  const small = remain > 0 ? Math.ceil(remain / 10) : 0;
-  const rows = [];
-  if (large > 0) rows.push({ key: lKey, mat: mL, qty: large });
-  if (small > 0) rows.push({ key: sKey, mat: mS, qty: small });
+const ceil = Math.ceil, floor = Math.floor;
+const fmt = n => n.toLocaleString('ja-JP');
+
+function calcSealer(area){
+  const uS = MAT.sealerS.price/MAT.sealerS.coverage, uL = MAT.sealerL.price/MAT.sealerL.coverage;
+  if(uL<=uS){
+    const lg=floor(area/125), rem=area-lg*125, sm=rem>0?ceil(rem/33.3):0;
+    const rows=[];
+    if(lg>0) rows.push({key:'sealerL',mat:MAT.sealerL,qty:lg});
+    if(sm>0) rows.push({key:'sealerS',mat:MAT.sealerS,qty:sm});
+    return rows;
+  }
+  return [{key:'sealerS',mat:MAT.sealerS,qty:ceil(area/33.3)}];
+}
+
+function calcClear(area,type){
+  if(type==='none') return [];
+  const sK=type==='gloss'?'clearGlossS':'clearMatteS', lK=type==='gloss'?'clearGlossL':'clearMatteL';
+  const lg=floor(area/80), rem=area-lg*80, sm=rem>0?ceil(rem/10):0;
+  const rows=[];
+  if(lg>0) rows.push({key:lK,mat:MAT[lK],qty:lg});
+  if(sm>0) rows.push({key:sK,mat:MAT[sK],qty:sm});
   return rows;
 }
 
-function calcSealer(area) {
-  const mS = MATERIALS.sealerS, mL = MATERIALS.sealerL;
-  // コスパ比較（㎡単価）
-  const unitS = mS.price / mS.coverage;
-  const unitL = mL.price / mL.coverage;
-  if (unitL <= unitS) {
-    const large = Math.floor(area / 125);
-    const remain = area - large * 125;
-    const small = remain > 0 ? Math.ceil(remain / 33.3) : 0;
-    const rows = [];
-    if (large > 0) rows.push({ key: 'sealerL', mat: mL, qty: large });
-    if (small > 0) rows.push({ key: 'sealerS', mat: mS, qty: small });
-    return rows;
+function buildSteps(mode,area,clear){
+  if(area<=0) return [];
+  if(mode==='interior'){
+    const mQ=ceil(area/4.5), fQ=ceil(area/12.5);
+    return [
+      {title:'工程1｜下地処理', rows:[
+        {key:'pate',mat:MAT.pate,qty:ceil(area/62.5)},
+        {key:'tape',mat:MAT.tape,qty:ceil(area/60)},
+      ]},
+      {title:'工程2｜下塗り', rows:[
+        {key:'under',mat:MAT.under,qty:ceil(area/3.3)},
+      ]},
+      {title:'工程3｜主材塗り', rows:[
+        {key:'mwMain',mat:MAT.mwMain,qty:mQ},
+        {key:'mwColor',mat:MAT.mwColor,qty:mQ},
+      ]},
+      {title:'工程4｜フィニッシュ', rows:[
+        {key:'mwFin',mat:MAT.mwFin,qty:fQ},
+        {key:'mwColor',mat:MAT.mwColor,qty:fQ},
+      ]},
+      ...(clear!=='none'?[{title:'工程5｜クリヤー（オプション）',rows:calcClear(area,clear)}]:[]),
+    ];
   } else {
-    return [{ key: 'sealerS', mat: mS, qty: Math.ceil(area / 33.3) }];
+    const mQ=ceil(area/4.5), fQ=ceil(area/10);
+    return [
+      {title:'工程1｜下塗り（シーラーW）', rows:calcSealer(area)},
+      {title:'工程2｜主材塗り', rows:[
+        {key:'exMain',mat:MAT.exMain,qty:mQ},
+        {key:'exColor',mat:MAT.exColor,qty:mQ},
+      ]},
+      {title:'工程3｜フィニッシュ', rows:[
+        {key:'exFin',mat:MAT.exFin,qty:fQ},
+        {key:'exColor',mat:MAT.exColor,qty:fQ},
+      ]},
+      ...(clear!=='none'?[{title:'工程4｜クリヤー（オプション）',rows:calcClear(area,clear)}]:[]),
+    ];
   }
 }
 
-function calcInterior(area, clear) {
-  const steps = [];
-  // 工程1: 下地処理
-  steps.push({
-    title: '工程1｜下地処理（石膏ボード）',
-    rows: [
-      { key: 'pate', mat: MATERIALS.pate, qty: Math.ceil(area / 62.5) },
-      { key: 'tape', mat: MATERIALS.tape, qty: Math.ceil(area / 60) },
-    ]
-  });
-  // 工程2: 下塗り
-  steps.push({
-    title: '工程2｜下塗り',
-    rows: [{ key: 'under', mat: MATERIALS.under, qty: Math.ceil(area / 3.3) }]
-  });
-  // 工程3: 主材
-  const mainQty = Math.ceil(area / 4.5);
-  steps.push({
-    title: '工程3｜主材塗り（MURA WALL）',
-    rows: [
-      { key: 'mwMain',  mat: MATERIALS.mwMain,  qty: mainQty },
-      { key: 'mwColor', mat: MATERIALS.mwColor, qty: mainQty },
-    ]
-  });
-  // 工程4: フィニッシュ
-  const finQty = Math.ceil(area / 12.5);
-  steps.push({
-    title: '工程4｜フィニッシュ（MURA WALL）',
-    rows: [
-      { key: 'mwFin',   mat: MATERIALS.mwFin,   qty: finQty },
-      { key: 'mwColor', mat: MATERIALS.mwColor, qty: finQty },
-    ]
-  });
-  // 工程5: クリヤー（オプション）
-  const clearRows = calcClear(area, clear);
-  if (clearRows.length > 0) {
-    steps.push({ title: '工程5｜クリヤー仕上げ（オプション）', rows: clearRows });
-  }
-  return steps;
+// 余り試算
+function calcSurplus(row, qty, area){
+  const m=row.mat;
+  if(m.noSurplus || !m.coverage || qty===0) return null;
+  const covTotal = m.coverage * qty;     // 購入で施工可能な面積
+  const cost = m.price * qty;            // 購入合計
+  if(covTotal <= area) return null;      // 余りなし
+  const jobCost = Math.round(cost * area / covTotal);
+  const surplusVal = cost - jobCost;
+  const surplusSqm = covTotal - area;
+  return {covTotal, cost, jobCost, surplusVal, surplusSqm};
 }
 
-function calcExterior(area, clear) {
-  const steps = [];
-  // 工程1: シーラー
-  steps.push({ title: '工程1｜下塗り（シーラーW）', rows: calcSealer(area) });
-  // 工程2: 主材
-  const mainQty = Math.ceil(area / 4.5);
-  steps.push({
-    title: '工程2｜主材塗り（MURA WALL EX）',
-    rows: [
-      { key: 'exMain',  mat: MATERIALS.exMain,  qty: mainQty },
-      { key: 'exColor', mat: MATERIALS.exColor, qty: mainQty },
-    ]
-  });
-  // 工程3: フィニッシュ
-  const finQty = Math.ceil(area / 10);
-  steps.push({
-    title: '工程3｜フィニッシュ（MURA WALL EX）',
-    rows: [
-      { key: 'exFin',   mat: MATERIALS.exFin,   qty: finQty },
-      { key: 'exColor', mat: MATERIALS.exColor, qty: finQty },
-    ]
-  });
-  // 工程4: クリヤー（オプション）
-  const clearRows = calcClear(area, clear);
-  if (clearRows.length > 0) {
-    steps.push({ title: '工程4｜クリヤー仕上げ（オプション）', rows: clearRows });
-  }
-  return steps;
-}
-
-function calcTotal(steps, overrides) {
-  let total = 0;
-  steps.forEach(step => {
-    step.rows.forEach(row => {
-      const qty = overrides[row.key] !== undefined ? overrides[row.key] : row.qty;
-      total += row.mat.price * qty;
+function calcTotals(steps, overrides, area){
+  let purchase=0, jobCost=0, hasSurplus=false;
+  steps.forEach(step=>{
+    step.rows.forEach(row=>{
+      const qty = overrides[row.key]!==undefined ? overrides[row.key] : row.qty;
+      const cost = row.mat.price * qty;
+      purchase += cost;
+      const sp = calcSurplus(row, qty, area);
+      if(sp){
+        hasSurplus=true;
+        jobCost += sp.jobCost;
+      } else {
+        jobCost += cost;
+      }
     });
   });
-  return total;
+  return {purchase, jobCost, surplusVal: purchase-jobCost, hasSurplus};
 }
 
-const fmt = n => n.toLocaleString('ja-JP');
-
 // ============================================================
-// 単価表コンポーネント
+// 単価表
 // ============================================================
-function PriceTablePanel() {
-  const sections = [
-    { label: '内装 MURA WALL — 下地処理', keys: ['pate','tape'] },
-    { label: '内装 MURA WALL — 下塗り', keys: ['under'] },
-    { label: '内装 MURA WALL — 主材・フィニッシュ', keys: ['mwMain','mwColor','mwFin'] },
-    { label: '外装 MURA WALL EX — 下塗りシーラー', keys: ['sealerS','sealerL'] },
-    { label: '外装 MURA WALL EX — 主材・フィニッシュ', keys: ['exMain','exColor','exFin'] },
-    { label: 'クリヤー仕上げ（内外共通）', keys: ['clearGlossS','clearGlossL','clearMatteS','clearMatteL'] },
+function PriceTab(){
+  const secs=[
+    {label:'内装 MURA WALL — 下地処理', keys:['pate','tape']},
+    {label:'内装 MURA WALL — 下塗り', keys:['under']},
+    {label:'内装 MURA WALL — 主材・フィニッシュ', keys:['mwMain','mwColor','mwFin']},
+    {label:'外装 MURA WALL EX — シーラー', keys:['sealerS','sealerL']},
+    {label:'外装 MURA WALL EX — 主材・フィニッシュ', keys:['exMain','exColor','exFin']},
+    {label:'クリヤー（内外共通）', keys:['clearGlossS','clearGlossL','clearMatteS','clearMatteL']},
   ];
-  return (
+  return(
     <div>
-      {sections.map(sec => (
-        <div key={sec.label} style={{marginBottom:14}}>
-          <div style={{fontSize:11,fontWeight:700,color:'#888',padding:'6px 0',textTransform:'uppercase',letterSpacing:'0.05em',borderBottom:'1px solid #eee',marginBottom:4}}>
-            {sec.label}
-          </div>
-          <table className="price-table" style={{width:'100%'}}>
-            <thead>
-              <tr>
-                <th>品名</th>
-                <th>容量</th>
-                <th style={{textAlign:'right'}}>単価（税抜）</th>
-                <th style={{textAlign:'right'}}>㎡単価</th>
-              </tr>
-            </thead>
+      {secs.map(sec=>(
+        <div key={sec.label} style={{marginBottom:16}}>
+          <div style={{fontSize:11,fontWeight:700,color:'#888',padding:'5px 0',borderBottom:'1px solid #eee',marginBottom:5,textTransform:'uppercase',letterSpacing:'.05em'}}>{sec.label}</div>
+          <table className="ptbl">
+            <thead><tr><th>品名</th><th>容量</th><th style={{textAlign:'right'}}>単価（税抜）</th><th style={{textAlign:'right'}}>㎡単価</th></tr></thead>
             <tbody>
-              {sec.keys.map(k => {
-                const m = MATERIALS[k];
-                const sqm = m.coverage ? `¥${fmt(Math.round(m.price/m.coverage))}/㎡` : '—';
-                return (
+              {sec.keys.map(k=>{
+                const m=MAT[k];
+                return(
                   <tr key={k+m.size}>
                     <td>{m.name}</td>
                     <td>{m.size}</td>
                     <td style={{textAlign:'right',fontWeight:600}}>¥{fmt(m.price)}</td>
-                    <td style={{textAlign:'right',color:'#888'}}>{sqm}</td>
+                    <td style={{textAlign:'right',color:'#888'}}>{m.coverage?`¥${fmt(Math.round(m.price/m.coverage))}/㎡`:'—'}</td>
                   </tr>
                 );
               })}
@@ -371,71 +396,509 @@ function PriceTablePanel() {
           </table>
         </div>
       ))}
+      <div style={{fontSize:11,color:'#aaa'}}>※価格は税抜。㎡単価は標準施工面積の中央値で算出。</div>
     </div>
   );
 }
 
 // ============================================================
-// 施工要領コンポーネント
+// 施工要領 詳細版（PDF全内容準拠）
 // ============================================================
-function ManualPanel({mode}) {
-  if (mode === 'interior') return (
-    <div>
-      <div className="manual-section">
-        <div className="manual-title">■ 下地処理（石膏ボード）</div>
-        <ul className="manual-note"><li>FCクイックパテをジョイント部・ビス凹みへしごき込み（2時間以上乾燥）</li><li>ファイバーテープをジョイント・出隅入隅に貼付後、パテ上塗り</li><li>全面にベストアンダーを1mm厚で塗布（24時間以上乾燥）</li></ul>
+function FlowStep({num,title,tags=[],desc,isLast=false}){
+  return(
+    <div className="flow-step">
+      <div className="flow-num">
+        <div className="flow-circle">{num}</div>
+        {!isLast&&<div className="flow-line"/>}
       </div>
-      <div className="manual-section">
-        <div className="manual-title">■ 主材（MURA WALL）調合比 / 4〜5㎡</div>
-        <table className="manual-table"><thead><tr><th>材料</th><th>調合量</th></tr></thead>
-          <tbody>
-            <tr><td>MURA WALL 主材</td><td>3.6kg</td></tr>
-            <tr><td>添付ボンド（セット内蔵）</td><td>0.275kg</td></tr>
-            <tr><td>MURA WALL カラー</td><td>0.1kg（1袋）</td></tr>
-            <tr><td>清水</td><td>1.7L</td></tr>
-          </tbody>
-        </table>
-        <div className="manual-note" style={{marginTop:6}}>塗り厚1mm・1回塗り。ベストアンダー完全乾燥後に施工。</div>
-      </div>
-      <div className="manual-section">
-        <div className="manual-title">■ フィニッシュ（MURA WALL）調合比 / 10〜15㎡</div>
-        <table className="manual-table"><thead><tr><th>材料</th><th>調合量</th></tr></thead>
-          <tbody>
-            <tr><td>MURA WALL フィニッシュ</td><td>3.0kg</td></tr>
-            <tr><td>MURA WALL カラー</td><td>0.1kg（1袋）</td></tr>
-          </tbody>
-        </table>
-        <div className="manual-note" style={{marginTop:6}}>主材完全乾燥後（24時間以上）に施工。撹拌しすぎると柄が崩れるため注意。</div>
+      <div className="flow-body">
+        <div style={{display:'flex',alignItems:'center',gap:6,flexWrap:'wrap',marginBottom:3}}>
+          <div className="flow-title">{title}</div>
+          {tags.map((t,i)=><span key={i} className={`flow-tag ${t.type}`}>{t.label}</span>)}
+        </div>
+        <div className="flow-desc">{desc}</div>
       </div>
     </div>
   );
-  return (
+}
+
+function MixBox({title,rows,area,note}){
+  const maxAmt=Math.max(...rows.map(r=>r.ratio));
+  return(
+    <div className="mix-box">
+      <div className="mix-title">🧪 {title}</div>
+      {rows.map((r,i)=>(
+        <div className="mix-row" key={i}>
+          <div className="mix-name">{r.name}</div>
+          <div className="mix-bar-wrap"><div className="mix-bar" style={{width:`${Math.round(r.ratio/maxAmt*100)}%`}}/></div>
+          <div className="mix-amt">{r.amt}</div>
+        </div>
+      ))}
+      {area&&<div className="mix-area">塗布面積：{area}</div>}
+      {note&&<div className="mix-note">※ {note}</div>}
+    </div>
+  );
+}
+
+function ManualSection({mode}){
+  const [sec,setSec]=useState('flow');
+
+  if(mode==='interior') return(
     <div>
-      <div className="manual-section">
-        <div className="manual-title">■ シーラーW（下塗り）</div>
-        <ul className="manual-note"><li>原液をそのまま使用（水で希釈しない）</li><li>VPローラー中毛またはエアレスで全面塗布（0.1〜0.15kg/㎡）</li><li>3時間以上乾燥させてから主材を塗布する</li></ul>
+      {/* セクションタブ */}
+      <div className="man-tabs">
+        {[['flow','工程フロー'],['prep','下地処理'],['main','主材施工'],['fin','フィニッシュ'],['clear','クリヤー'],['mat','使用材料']].map(([k,l])=>(
+          <div key={k} className={`man-tab${sec===k?' on':''}`} onClick={()=>setSec(k)}>{l}</div>
+        ))}
       </div>
-      <div className="manual-section">
-        <div className="manual-title">■ 主材（MURA WALL EX）調合比 / 4〜5㎡</div>
-        <table className="manual-table"><thead><tr><th>材料</th><th>調合量</th></tr></thead>
-          <tbody>
-            <tr><td>MURA WALL EX 主材</td><td>4.0kg</td></tr>
-            <tr><td>専用ボンド（セット内蔵）</td><td>1.2kg</td></tr>
-            <tr><td>MURA WALL EX カラー</td><td>0.1kg（1袋）</td></tr>
-            <tr><td>清水</td><td>1.2L</td></tr>
-          </tbody>
-        </table>
+
+      {/* 工程フロー */}
+      {sec==='flow'&&(
+        <div className="man-section">
+          <div className="man-h1">MURA WALL 施工フロー（石膏ボード下地）</div>
+          <div className="flow">
+            <FlowStep num="1" title="石膏ボード切り口処理" tags={[{type:'mat',label:'ストロングE'}]} desc="石膏露出箇所がある場合はストロングEの希釈液を刷毛で塗布し乾燥させる。"/>
+            <FlowStep num="2" title="パテ下塗り（ジョイント・ビス凹み）" tags={[{type:'mat',label:'FCクイックパテ'},{ type:'dry',label:'乾燥2時間以上'}]} desc="固練りしたFCクイックパテをジョイント部・ビスの凹み部分へしごき込む。余分なパテはしごき取る。2時間以上乾燥。"/>
+            <FlowStep num="3" title="ファイバーテープ貼り" tags={[{type:'mat',label:'ファイバーテープ 50mm幅'}]} desc="石膏ボードのジョイント部および出隅入隅部にファイバーテープを貼り付ける。縦横で二重になる部分は一方をカット。"/>
+            <FlowStep num="4" title="パテ上塗り（テープ幅より広く）" tags={[{type:'mat',label:'FCクイックパテ'},{ type:'dry',label:'乾燥1時間以上'}]} desc="FCクイックパテをファイバーテープの幅より広くしごき塗る。端部が段差にならないよう薄く延ばす。1時間以上乾燥。"/>
+            <FlowStep num="5" title="ベストアンダー 全面塗布" tags={[{type:'mat',label:'ベストアンダー'},{ type:'dry',label:'乾燥24時間以上'}]} desc="全面に約1mm厚でコテ塗り、コテ波を消して仕上げる。完全乾燥させること（乾燥不十分だと仕上げ時に気泡が発生する）。"/>
+            <FlowStep num="6" title="MURA WALL 主材塗り（1回塗り）" tags={[{type:'mat',label:'MURA WALL主材+カラー'},{ type:'dry',label:'乾燥24時間以上'}]} desc="標準塗り厚1mm・1回塗り。骨材の厚みで透けがないように塗り付け、水が引く前に軽く波を消して仕上げる。白い部分（カラーが混ざっていない箇所）はコテで取り除く。"/>
+            <FlowStep num="7" title="MURA WALL フィニッシュ（1回塗り）" tags={[{type:'mat',label:'MWフィニッシュ+カラー'},{ type:'dry',label:'乾燥24時間以上'}]} desc="薄手のコテでランダムに模様を付けながら塗り付ける。10〜20cm程度にランダムな模様を付けるイメージ。コテ圧を掛け過ぎないこと。水引き前に色・柄・塗布量の偏りをコテで調整。"/>
+            <FlowStep num="8" title="クリヤー塗布（任意）" tags={[{type:'mat',label:'MWクリヤー'},{ type:'dry',label:'乾燥3時間以上（工程間）'}]} desc="マイクロファイバーローラー中毛（推奨：マイクロキューブ12mm）で2回塗り。1回目と2回目の間は3時間以上乾燥。最終養生は24時間以上。⚠️ 内装に使用すると防火認定外。" isLast={true}/>
+          </div>
+        </div>
+      )}
+
+      {/* 下地処理 */}
+      {sec==='prep'&&(
+        <div className="man-section">
+          <div className="man-h1">Ⅱ. 下地処理方法（石膏ボード下地）</div>
+          <div className="man-h2">石膏ボードの取り付け要件</div>
+          <div className="point"><ul>
+            <li>石膏ボードは突き付け張りにする。取り付け釘・ビスはステンレス製を使用。</li>
+            <li>ボード取り付け：周囲は間隔10cm以内、その他は受け木当たり間隔15cm以内で平頭釘止め。</li>
+            <li>取り付け釘・ビスの長さはボード厚の2.5〜3.0倍のものを使用。</li>
+            <li>欠け・割れ・紙のはがれ・汚れ・きず・へこみのないボードを使用。</li>
+            <li>石膏ボードの切り口（石膏露出箇所）があればストロングEの希釈液を刷毛で塗って乾燥させる。</li>
+          </ul></div>
+
+          <div className="man-h2">FCクイックパテの施工方法</div>
+          <MixBox title="FCクイックパテ 標準加水量" rows={[
+            {name:'FCクイックパテ（下パテ）',ratio:35,amt:'3.5kg + 水1.8L'},
+            {name:'FCクイックパテ（上パテ）',ratio:35,amt:'3.5kg + 水2.0L'},
+          ]} note="可使時間1時間。固いほどジョイントのヤセが小さく乾燥も早い。ジョイント処理はベストアンダー全面塗布の前日に行うのが理想。"/>
+          <div className="man-h2">施工手順</div>
+          <div className="flow">
+            <FlowStep num="1" title="下パテ：しごき込み" tags={[{type:'dry',label:'乾燥2時間以上'}]} desc="固練りしたFCクイックパテをジョイント部・ビスの凹み部分へしごき込む。周辺に付着した余分なパテはしごき取る。"/>
+            <FlowStep num="2" title="ファイバーテープ貼り" tags={[{type:'mat',label:'50mm幅テープ'}]} desc="石膏ボードのジョイント部・出隅入隅部にファイバーテープを貼り付ける。縦横で二重に重なる部分は一方をカット。"/>
+            <FlowStep num="3" title="上パテ：テープ幅より広くしごき塗り" tags={[{type:'dry',label:'乾燥1時間以上'}]} desc="ファイバーテープの幅より広くなるようにしごき塗る。はみ出したパテはできるだけ薄く延ばし、端部が段差にならないようにする。" isLast/>
+          </div>
+
+          <div className="man-h2">ベストアンダーの施工方法</div>
+          <MixBox title="ベストアンダー 調合比（1袋分）" rows={[
+            {name:'ベストアンダー',ratio:33,amt:'3.3kg'},
+            {name:'清水',ratio:27,amt:'2.7L'},
+          ]} area="3.3㎡/袋（固定）" note="約2.3Lの水にベストアンダー1袋を加えて十分に撹拌 → 10分練り置き → 残りの水で固さ調整。柔らかく練るとダレるため心持ち固めに。"/>
+          <div className="point"><ul>
+            <li>全面に約1mm厚でコテ塗り、コテ波を消して仕上げる。</li>
+            <li>塗り厚は約1mmを保つこと。</li>
+            <li>乾燥の目安：20℃・65%で24時間。</li>
+            <li>乾燥が不十分な場合、仕上げ材塗布時に気泡が発生する。</li>
+          </ul></div>
+        </div>
+      )}
+
+      {/* 主材施工 */}
+      {sec==='main'&&(
+        <div className="man-section">
+          <div className="man-h1">Ⅲ. MURA WALL 主材施工方法</div>
+          <MixBox title="主材 調合比（1バッチ = 4〜5㎡分）" rows={[
+            {name:'MURA WALL 主材',ratio:36,amt:'3.6kg'},
+            {name:'添付ボンド（セット内蔵）',ratio:2.75,amt:'0.275kg'},
+            {name:'MURA WALL カラー',ratio:1,amt:'0.1kg（1袋全量）'},
+            {name:'清水',ratio:17,amt:'1.7L'},
+          ]} area="4〜5㎡/バッチ" note="標準加水量の約9割（1.5〜1.6L）の水にカラーと添付ボンドを先に加えて混ぜてから主材を投入。"/>
+
+          <div className="man-h2">材料の混練り手順</div>
+          <div className="flow">
+            <FlowStep num="1" title="水にカラー＋添付ボンドを先混ぜ" desc="標準加水量の約9割（1.5〜1.6L）の水に、MURA WALLカラーと添付ボンドを加えて軽くかき混ぜる。カラーの容器は練り水でよくすすいで全量を使い切ること。"/>
+            <FlowStep num="2" title="MURA WALL 主材を投入し十分に練る" desc="MURA WALL主材を加え、ハンドミキサーなどで十分に練る。ミキサーは混練り量に応じた撹拌能力のあるものを使用。"/>
+            <FlowStep num="3" title="練り置き → 固さ調整" tags={[{type:'dry',label:'10分 練り置き'}]} desc="約10分練り置きし、残りの水（0.1L）を徐々に加えて施工しやすい固さに調整する。" isLast/>
+          </div>
+          <div className="caution">
+            <div className="caution-title">⚠️ 注意点</div>
+            <ul>
+              <li>練り容器のふちや底に付着した練れていない材料に注意すること。</li>
+              <li>ハンドミキサーは混練り量に応じた撹拌能力のあるものを使用すること。</li>
+            </ul>
+          </div>
+
+          <div className="man-h2">養生</div>
+          <div className="point"><ul>
+            <li>柱等の施工しない箇所は養生テープ・養生マスカーで養生する。</li>
+            <li>材料がこぼれた場合に備えて、床にはビニルシート・養生シートを敷くこと。</li>
+          </ul></div>
+
+          <div className="man-h2">塗り付け・仕上げ</div>
+          <div className="flow">
+            <FlowStep num="1" title="ベストアンダーの乾燥を確認してから施工" desc="ベストアンダーが完全に乾燥していることを確認してから塗布する。"/>
+            <FlowStep num="2" title="1回塗り・標準塗り厚1mm" tags={[{type:'warn',label:'1回塗り'}]} desc="MURA WALL主材は1回塗りで標準塗り厚は1mm程度。カラーが混ざっていない白い部分があった場合はコテで取り除く。"/>
+            <FlowStep num="3" title="波消し仕上げ" desc="骨材の厚みで透けがないように塗り付け、水が引く前に軽く波を消して仕上げる。" isLast/>
+          </div>
+        </div>
+      )}
+
+      {/* フィニッシュ */}
+      {sec==='fin'&&(
+        <div className="man-section">
+          <div className="man-h1">Ⅳ. MURA WALL フィニッシュ施工方法</div>
+          <MixBox title="フィニッシュ 調合比（1缶分）" rows={[
+            {name:'MURA WALL フィニッシュ',ratio:30,amt:'3.0kg'},
+            {name:'MURA WALL カラー',ratio:1,amt:'0.1kg（1袋全量）'},
+          ]} area="10〜15㎡/缶" note="カラーはよく揉んでから投入。容器は少量の水（50g以下）ですすいで全量使い切ること。"/>
+
+          <div className="man-h2">混練り注意事項</div>
+          <div className="caution">
+            <div className="caution-title">⚠️ 重要な注意点</div>
+            <ul>
+              <li>ハンドミキサーはスクリュー型の低速撹拌機を使用すること。</li>
+              <li><strong>撹拌しすぎると柄がつぶれてしまうため注意。</strong></li>
+              <li>MURA WALLフィニッシュは色に応じて4種類。必ず対応したカラーとセットで使用。</li>
+              <li>カラー投入後、容器は少量の水（50g以下）ですすいで全量使い切ること。</li>
+            </ul>
+          </div>
+
+          <div className="man-h2">施工前確認</div>
+          <div className="point"><ul>
+            <li>MURA WALL主材が完全に乾燥しているか確認すること（24時間以上）。</li>
+            <li>パターンが突出した部分は、あらかじめ削り取っておくこと。</li>
+          </ul></div>
+
+          <div className="man-h2">施工方法（模様付け）</div>
+          <div className="flow">
+            <FlowStep num="1" title="薄手のコテでランダムに模様を付けながら塗り付け" desc="10〜20cm程度にランダムな模様を付けるイメージで塗り付ける。コテ圧を掛け過ぎないように注意。出隅・入隅や役物周辺を先に塗布すると全体のバランスが整いやすい。"/>
+            <FlowStep num="2" title="全体バランスを見ながら模様を調整" desc="水引き前に色・柄・塗布量の偏りなどをコテで調整しながら仕上りのバランスを取る。水が引き始めたタイミングで押えると柄がつぶれ過ぎることがあるため注意。" isLast/>
+          </div>
+          <div className="caution">
+            <div className="caution-title">⚠️ 必ず試し塗りを実施</div>
+            <ul><li>必ず本施工前に試し塗りを行い、作業性や仕上りを確認すること。</li></ul>
+          </div>
+        </div>
+      )}
+
+      {/* クリヤー */}
+      {sec==='clear'&&(
+        <div className="man-section">
+          <div className="man-h1">MURA WALL クリヤー 施工要領</div>
+          <div className="caution">
+            <div className="caution-title">⚠️ 内装に使用すると防火認定外になります</div>
+            <ul><li>MURA WALLに塗布した場合、内装防火認定外となります。必ず施主に説明の上使用してください。</li></ul>
+          </div>
+
+          <div className="man-h2">標準仕様</div>
+          <table className="spec-tbl">
+            <thead><tr><th>工程</th><th>材料</th><th>調合</th><th>所要量</th><th>塗り回数</th><th>工程間間隔</th></tr></thead>
+            <tbody>
+              <tr><td>クリヤー塗布</td><td>MURA WALLクリヤー（艶有/艶消）</td><td>2kg + 清水50〜100mL</td><td>0.2kg/㎡（2回合計）</td><td>2回</td><td>3時間以上</td></tr>
+            </tbody>
+          </table>
+          <div style={{fontSize:11,color:'#888',margin:'4px 0 8px'}}>最終養生：24時間以上　/ 工程間間隔は標準時（20℃・65%）を想定</div>
+
+          <div className="man-h2">工程フロー</div>
+          <div className="flow">
+            <FlowStep num="1" title="適用下地の確認・養生" desc="MURA WALL / MURA WALL EXが完全乾燥していることを確認。施工面以外は養生テープ・ビニールで十分に養生（施工面から数mm逃げて養生）。ペイント塗装面は粘着力の小さなテープで捨貼り養生。"/>
+            <FlowStep num="2" title="材料の調整" desc="MURA WALLクリヤーに適量の水を加え、ハンドミキサー等で十分に撹拌して使用。"/>
+            <FlowStep num="3" title="クリヤー塗り（1回目）" tags={[{type:'dry',label:'乾燥3時間以上'}]} desc="マイクロファイバーローラー中毛（推奨：マイクロキューブ12mm）でムラの無いよう施工。3時間以上乾燥。吹付施工（エアスプレー、エアレス）も可能。"/>
+            <FlowStep num="4" title="養生除去（早めに）" desc="早めに養生を除去する。"/>
+            <FlowStep num="5" title="クリヤー塗り（2回目）" tags={[{type:'dry',label:'最終養生24時間以上'}]} desc="1回目と同様にマイクロファイバーローラーでムラなく施工。最終養生24時間以上。合計所要量：0.2kg/㎡（2回塗り）。" isLast/>
+          </div>
+
+          <div className="man-h2">使用材料（荷姿・施工面積）</div>
+          <table className="spec-tbl">
+            <thead><tr><th>品名</th><th>容量</th><th>施工面積</th></tr></thead>
+            <tbody>
+              <tr><td>MURA WALLクリヤー 艶あり</td><td>2kg/缶</td><td>10.0㎡/缶</td></tr>
+              <tr><td>MURA WALLクリヤー 艶あり</td><td>16kg/缶</td><td>80.0㎡/缶</td></tr>
+              <tr><td>MURA WALLクリヤー 艶消し</td><td>2kg/缶</td><td>10.0㎡/缶</td></tr>
+              <tr><td>MURA WALLクリヤー 艶消し</td><td>16kg/缶</td><td>80.0㎡/缶</td></tr>
+            </tbody>
+          </table>
+
+          <div className="caution">
+            <div className="caution-title">⚠️ 施工禁止条件</div>
+            <ul>
+              <li>気温が5℃以下・湿度が85%以上・結露が考えられる場合は施工しないこと。</li>
+              <li>降雨・降雪・強風が予想される場合は施工しないこと。</li>
+              <li>外部施工の場合は風・直射日光を防ぐためシート養生を行うこと。</li>
+              <li>材料は凍結・直射日光を避けて保管。使用後の器具は乾燥しないうちに水洗い。</li>
+            </ul>
+          </div>
+        </div>
+      )}
+
+      {/* 使用材料一覧 */}
+      {sec==='mat'&&(
+        <div className="man-section">
+          <div className="man-h1">使用材料一覧（内装 MURA WALL）</div>
+          <table className="spec-tbl">
+            <thead><tr><th>No.</th><th>品名</th><th>形態・容量</th><th>用途</th></tr></thead>
+            <tbody>
+              <tr><td>①</td><td>ファイバーテープ</td><td>50mm幅×90m/巻</td><td>ジョイント・出隅入隅処理用</td></tr>
+              <tr><td>②</td><td>ストロングE</td><td>1kg/缶</td><td>石膏ボード切り口（石膏露出箇所）の処理</td></tr>
+              <tr><td>③</td><td>FCクイックパテ</td><td>3.5kg/袋</td><td>パテ材</td></tr>
+              <tr><td>④</td><td>ベストアンダー</td><td>3.3kg/袋</td><td>下塗材</td></tr>
+              <tr><td>⑤</td><td>MURA WALL 主材</td><td>3.875kg/セット</td><td>主材①（添付ボンド内蔵）</td></tr>
+              <tr><td>⑥</td><td>MURA WALL カラー</td><td>100g/袋</td><td>着色材（主材用）</td></tr>
+              <tr><td>⑦</td><td>MURA WALL フィニッシュ</td><td>3kg/缶</td><td>主材②</td></tr>
+              <tr><td>⑧</td><td>MURA WALL カラー</td><td>100g/袋</td><td>着色材（フィニッシュ用）</td></tr>
+            </tbody>
+          </table>
+          <div style={{fontSize:11,color:'#888',marginTop:6}}>適用下地：石膏ボード（下地処理必要）／ 用途：建築内装全般（壁・天井）</div>
+        </div>
+      )}
+    </div>
+  );
+
+  // 外装モードはここから
+  return null;
+}
+
+function ManualSectionEX(){
+  const [sec,setSec]=useState('flow');
+  return(
+    <div>
+      <div className="man-tabs">
+        {[['flow','工程フロー'],['sealer','シーラーW'],['main','主材施工'],['fin','フィニッシュ'],['clear','クリヤー'],['spec','標準仕様']].map(([k,l])=>(
+          <div key={k} className={`man-tab${sec===k?' on':''}`} onClick={()=>setSec(k)}>{l}</div>
+        ))}
       </div>
-      <div className="manual-section">
-        <div className="manual-title">■ フィニッシュ（MURA WALL EX）調合比 / 10㎡</div>
-        <table className="manual-table"><thead><tr><th>材料</th><th>調合量</th></tr></thead>
-          <tbody>
-            <tr><td>MURA WALL EX フィニッシュ</td><td>3.0kg</td></tr>
-            <tr><td>MURA WALL EX カラー</td><td>0.1kg（1袋）</td></tr>
-          </tbody>
-        </table>
-        <div className="manual-note" style={{marginTop:6}}>主材完全乾燥後（24時間以上）に施工。</div>
-      </div>
+
+      {sec==='flow'&&(
+        <div className="man-section">
+          <div className="man-h1">MURA WALL EX 施工フロー（モルタル下地）</div>
+          <div className="flow">
+            <FlowStep num="1" title="モルタル下地の確認・処理" tags={[{type:'warn',label:'含水率10%以下'}]} desc="モルタルは木ゴテで整え、金ゴテで押さえて仕上げ、十分な乾燥時間をとる（含水率10%以下）。"/>
+            <FlowStep num="2" title="シーラーW 全面塗布" tags={[{type:'mat',label:'シーラーW（原液）'},{ type:'dry',label:'乾燥3時間以上'}]} desc="シーラーW原液を全面に塗布。水で希釈しないこと。VPローラー中毛・エアレス・エアスプレー・刷毛等で均一に塗布。塗り残し・カスレ・ダレがないようにする。乾燥3時間以上。"/>
+            <FlowStep num="3" title="MURA WALL EX 主材塗り（1回塗り）" tags={[{type:'mat',label:'EX主材+EXカラー'},{ type:'dry',label:'乾燥24時間以上'}]} desc="シーラーWが十分乾燥していることを確認してから施工。標準塗り厚1mm・1回塗り。塗布面積4〜5㎡/バッチ。"/>
+            <FlowStep num="4" title="MURA WALL EX フィニッシュ（1回塗り）" tags={[{type:'mat',label:'EXフィニッシュ+EXカラー'},{ type:'dry',label:'乾燥24時間以上'}]} desc="主材が完全乾燥後（24時間以上）に施工。薄手のコテでランダムに模様を付けながら塗り付ける。塗布面積10㎡/缶。"/>
+            <FlowStep num="5" title="クリヤー塗布（オプション）" tags={[{type:'mat',label:'MWクリヤー'},{ type:'dry',label:'工程間3時間以上'}]} desc="MURA WALLクリヤー（艶有/艶消）2回塗り。マイクロファイバーローラー中毛で施工。最終養生24時間以上。" isLast/>
+          </div>
+        </div>
+      )}
+
+      {sec==='sealer'&&(
+        <div className="man-section">
+          <div className="man-h1">シーラーW 施工方法</div>
+          <div className="caution">
+            <div className="caution-title">⚠️ 必ず原液使用（希釈不可）</div>
+            <ul>
+              <li>シーラーWは水で希釈しないこと。</li>
+              <li>仕上材が白色の場合は「シーラレスカラー 白」を使用する。</li>
+            </ul>
+          </div>
+
+          <div className="man-h2">材料の撹拌</div>
+          <div className="point"><ul><li>容器をよく振って撹拌してから使用すること。</li></ul></div>
+
+          <div className="man-h2">塗布方法</div>
+          <div className="flow">
+            <FlowStep num="1" title="下地の乾燥確認" desc="下地が十分に乾燥していることを確認してからシーラーWを全面に塗布する。"/>
+            <FlowStep num="2" title="全面均一に塗布" desc="エアレス・エアスプレー・中毛ウールローラー・刷毛等で全面に均一に塗布。塗り残し・カスレ・ダレがないよう注意。"/>
+            <FlowStep num="3" title="完全乾燥" tags={[{type:'dry',label:'乾燥3時間以上（20℃65%）'}]} desc="塗布したシーラーWを十分に乾燥させる。乾燥の目安は通常（20℃・65%）で3時間。" isLast/>
+          </div>
+
+          <div className="man-h2">使用量・荷姿</div>
+          <table className="spec-tbl">
+            <thead><tr><th>品名</th><th>容量</th><th>施工面積</th><th>使用量</th></tr></thead>
+            <tbody>
+              <tr><td>シーラーW</td><td>4kg/缶</td><td>26.6〜40.0㎡/缶</td><td>0.1〜0.15kg/㎡</td></tr>
+              <tr><td>シーラーW</td><td>15kg/缶</td><td>100〜150㎡/缶</td><td>同上</td></tr>
+            </tbody>
+          </table>
+
+          <div className="caution">
+            <div className="caution-title">⚠️ 施工禁止条件</div>
+            <ul>
+              <li>気温が5℃以下・降雨・降雪・強風が予想される場合は施工しないこと。</li>
+              <li>エアレス・エアスプレーで施工する場合は周囲の養生を徹底すること。</li>
+            </ul>
+          </div>
+        </div>
+      )}
+
+      {sec==='main'&&(
+        <div className="man-section">
+          <div className="man-h1">Ⅲ. MURA WALL EX 主材施工方法</div>
+          <MixBox title="主材 調合比（1バッチ = 4〜5㎡分）" rows={[
+            {name:'MURA WALL EX 主材',ratio:40,amt:'4.0kg'},
+            {name:'専用ボンド（セット内蔵）',ratio:12,amt:'1.2kg'},
+            {name:'MURA WALL EX カラー',ratio:1,amt:'0.1kg（1袋全量）'},
+            {name:'清水',ratio:12,amt:'1.2L'},
+          ]} area="4〜5㎡/バッチ" note="標準加水量の約9割（1.0〜1.1L）の水にカラーと専用ボンドを先に加えて混ぜ、主材を投入。"/>
+
+          <div className="man-h2">材料の混練り手順</div>
+          <div className="flow">
+            <FlowStep num="1" title="水にEXカラー＋専用ボンドを先混ぜ" desc="標準加水量の約9割（1.0〜1.1L）の水にMURA WALL EXカラーと専用ボンドを加えて軽くかき混ぜる。EXカラーの袋はよく揉み、練り水にしぼって全量使い切ること。"/>
+            <FlowStep num="2" title="MURA WALL EX 主材を投入し十分に練る" desc="MURA WALL EX主材を加え、ハンドミキサーなどで十分に練る。"/>
+            <FlowStep num="3" title="練り置き → 固さ調整" tags={[{type:'dry',label:'10分 練り置き'}]} desc="約10分練り置きし、残りの水（0.1L）を徐々に加えて施工しやすい固さに調整する。" isLast/>
+          </div>
+          <div className="caution">
+            <div className="caution-title">⚠️ 注意点</div>
+            <ul>
+              <li>練り容器のふちや底に付着した練れていない材料に注意すること。</li>
+              <li>ハンドミキサーは混練り量に応じた撹拌能力のあるものを使用。</li>
+            </ul>
+          </div>
+
+          <div className="man-h2">塗り付け・仕上げ</div>
+          <div className="flow">
+            <FlowStep num="1" title="シーラーWの乾燥を確認（3時間以上）" desc="シーラーWが十分に乾燥していることを確認してから塗布する。"/>
+            <FlowStep num="2" title="1回塗り・標準塗り厚1mm" tags={[{type:'warn',label:'1回塗り'}]} desc="標準塗り厚は1mm程度。カラーが混ざっていない白い部分があった場合はコテで取り除く。"/>
+            <FlowStep num="3" title="波消し仕上げ" desc="骨材の厚みで透けがないように塗り付け、水が引く前に軽く波を消して仕上げる。不規則な模様をイメージして波消しを行う。" isLast/>
+          </div>
+        </div>
+      )}
+
+      {sec==='fin'&&(
+        <div className="man-section">
+          <div className="man-h1">Ⅳ. MURA WALL EX フィニッシュ施工方法</div>
+          <MixBox title="フィニッシュ 調合比（1缶分）" rows={[
+            {name:'MURA WALL EX フィニッシュ',ratio:30,amt:'3.0kg'},
+            {name:'MURA WALL EX カラー',ratio:1,amt:'0.1kg（1袋全量）'},
+          ]} area="10㎡/缶（固定）" note="カラーの袋はよく揉み、練り水にしぼって全量使い切ること。"/>
+
+          <div className="man-h2">混練り注意事項</div>
+          <div className="caution">
+            <div className="caution-title">⚠️ 重要な注意点</div>
+            <ul>
+              <li>ハンドミキサーはスクリュー型の低速撹拌機を使用すること。</li>
+              <li><strong>撹拌しすぎると柄がつぶれてしまうため注意。</strong></li>
+              <li>MURA WALL EXフィニッシュは色に応じて5種類。必ず対応したカラーとセットで使用。</li>
+              <li>ハンドミキサーの種類・大きさに応じて別の容器に移すなどの工夫をすること。</li>
+            </ul>
+          </div>
+
+          <div className="man-h2">施工前確認</div>
+          <div className="point"><ul>
+            <li>MURA WALL EX主材が完全に乾燥しているか確認すること（24時間以上）。</li>
+            <li>パターンが突出した部分は、あらかじめ削り取っておくこと。</li>
+          </ul></div>
+
+          <div className="man-h2">施工方法（模様付け）</div>
+          <div className="flow">
+            <FlowStep num="1" title="薄手のコテでランダムに模様付け" desc="10〜20cm程度にランダムな模様を付けるイメージで塗り付ける。コテ圧を掛け過ぎないように注意。出隅・入隅や役物周辺を先に塗布すると全体バランスが整いやすい。"/>
+            <FlowStep num="2" title="全体バランスを見ながら模様を調整" desc="水引き前に色・柄・塗布量の偏りなどをコテで調整しながら仕上りのバランスを取る。水が引き始めたタイミングで押えると柄がつぶれ過ぎるため注意。" isLast/>
+          </div>
+          <div className="caution">
+            <div className="caution-title">⚠️ 必ず試し塗りを実施</div>
+            <ul><li>必ず本施工前に試し塗りを行い、作業性や仕上りを確認すること。</li></ul>
+          </div>
+        </div>
+      )}
+
+      {sec==='clear'&&(
+        <div className="man-section">
+          <div className="man-h1">MURA WALL クリヤー 施工要領（外装）</div>
+          <div className="man-h2">標準仕様</div>
+          <table className="spec-tbl">
+            <thead><tr><th>工程</th><th>材料</th><th>調合</th><th>所要量</th><th>塗り回数</th><th>工程間間隔</th></tr></thead>
+            <tbody>
+              <tr><td>クリヤー塗布</td><td>MWクリヤー（艶有/艶消）</td><td>2kg + 清水50〜100mL</td><td>0.2kg/㎡（2回合計）</td><td>2回</td><td>3時間以上</td></tr>
+            </tbody>
+          </table>
+          <div className="flow" style={{marginTop:12}}>
+            <FlowStep num="1" title="養生・下地確認" desc="MURA WALL EXが完全乾燥していることを確認。施工面以外を養生テープ・ビニールで十分養生（施工面から数mm逃げて養生）。"/>
+            <FlowStep num="2" title="材料の撹拌・調整" desc="MURA WALLクリヤーに適量の水（50〜100mL）を加え、ハンドミキサー等で十分に撹拌。"/>
+            <FlowStep num="3" title="クリヤー塗り（1回目）" tags={[{type:'dry',label:'乾燥3時間以上'}]} desc="マイクロファイバーローラー中毛（推奨：マイクロキューブ12mm）でムラなく施工。"/>
+            <FlowStep num="4" title="養生除去（早めに）" desc="早めに養生を除去する。"/>
+            <FlowStep num="5" title="クリヤー塗り（2回目）" tags={[{type:'dry',label:'最終養生24時間以上'}]} desc="1回目と同様にムラなく施工。合計所要量0.2kg/㎡。" isLast/>
+          </div>
+          <div className="caution">
+            <div className="caution-title">⚠️ 外装施工の追加注意事項</div>
+            <ul>
+              <li>風や直射日光を防ぐためにシート養生を行い、施工準備をすること。</li>
+              <li>気温5℃以下・湿度85%以上・降雨・降雪・強風時は施工しないこと。</li>
+            </ul>
+          </div>
+        </div>
+      )}
+
+      {sec==='spec'&&(
+        <div className="man-section">
+          <div className="man-h1">Ⅰ. 標準仕様（MURA WALL EX）</div>
+          <table className="spec-tbl">
+            <thead><tr><th>工程</th><th>材料</th><th>調合（重量比）</th><th>所要量（kg/㎡）</th><th>塗り回数</th><th>工程間間隔</th><th>最終養生</th></tr></thead>
+            <tbody>
+              <tr><td>1. シーラー</td><td>シーラーW</td><td>既調合（原液）</td><td>0.1〜0.15</td><td>1</td><td>3時間以上</td><td>—</td></tr>
+              <tr><td>2. 仕上材下塗</td><td>MURA WALL EX主材 4.0kg＋専用ボンド1.2kg＋EXカラー0.1kg＋清水1.2L</td><td>上記参照</td><td>1.3〜1.6</td><td>1</td><td>24時間以上</td><td>—</td></tr>
+              <tr><td>3. 仕上材上塗</td><td>MURA WALL EXフィニッシュ3.0kg＋EXカラー0.1kg</td><td>上記参照</td><td>0.3</td><td>1</td><td>—</td><td>24時間以上</td></tr>
+            </tbody>
+          </table>
+          <div style={{fontSize:11,color:'#888',margin:'4px 0 10px'}}>※工程間間隔は標準時（20℃・65%）を想定。シーラー器具：VPローラー中毛またはエアレス・エアスプレー。仕上材器具：金ゴテ。</div>
+          <div className="man-h2">荷姿・施工面積</div>
+          <table className="spec-tbl">
+            <thead><tr><th>品名</th><th>容量</th><th>施工面積</th></tr></thead>
+            <tbody>
+              <tr><td>シーラーW</td><td>4kg/缶</td><td>26.6〜40.0㎡/缶</td></tr>
+              <tr><td>シーラーW</td><td>15kg/缶</td><td>100〜150㎡/缶</td></tr>
+              <tr><td>MURA WALL EX主材</td><td>5.3kg/セット</td><td>4.0〜5.0㎡/セット</td></tr>
+              <tr><td>MURA WALL EXフィニッシュ</td><td>3.1kg/セット</td><td>10.0㎡/セット</td></tr>
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============================================================
+// 在庫タブ
+// ============================================================
+function StockTab({stocks, setStocks}){
+  const updateSqm=(id,val)=>{
+    setStocks(prev=>prev.map(s=>s.id===id?{...s,remainSqm:Math.max(0,parseFloat(val)||0)}:s));
+  };
+  const updateMemo=(id,val)=>{
+    setStocks(prev=>prev.map(s=>s.id===id?{...s,memo:val}:s));
+  };
+  const del=(id)=>{
+    if(!confirm('この在庫を削除しますか？')) return;
+    setStocks(prev=>prev.filter(s=>s.id!==id));
+  };
+  const totalSqm=stocks.reduce((s,x)=>s+x.remainSqm,0);
+  const totalVal=stocks.reduce((s,x)=>s+Math.round(x.unitValue*x.remainSqm),0);
+
+  return(
+    <div>
+      {stocks.length>0&&(
+        <div className="stock-total" style={{marginBottom:12}}>
+          <div className="row"><span>在庫合計面積</span><span style={{fontWeight:700,color:'var(--green)'}}>{totalSqm.toFixed(1)}㎡</span></div>
+          <div className="row"><span>在庫残存価値合計</span><span style={{fontWeight:700,color:'var(--green)'}}>¥{fmt(totalVal)}</span></div>
+        </div>
+      )}
+      {stocks.length===0?(
+        <div className="empty"><div className="ico">📦</div><div>在庫はありません</div><div style={{fontSize:12,marginTop:4}}>材料リストの「在庫に追加」で登録できます</div></div>
+      ):(
+        stocks.map(s=>(
+          <div className="stock-item" key={s.id}>
+            <div className="stock-item-hd">
+              <div><div className="stock-item-name">{s.matName}</div><div className="stock-item-size">{s.matSize} / {s.fromSite}</div></div>
+              <button className="stock-del" onClick={()=>del(s.id)}>削除</button>
+            </div>
+            <div className="stock-metrics">
+              <div className="stock-metric"><div className="lbl">残り施工可能面積</div><div className="val">{s.remainSqm.toFixed(1)}㎡</div></div>
+              <div className="stock-metric"><div className="lbl">残存価値（概算）</div><div className="val">¥{fmt(Math.round(s.unitValue*s.remainSqm))}</div></div>
+            </div>
+            <div className="stock-sqm-edit">
+              <span style={{fontSize:12,color:'var(--text-sub)'}}>残り面積を修正：</span>
+              <input className="stock-sqm-in" type="number" min="0" step="0.5" value={s.remainSqm} onChange={e=>updateSqm(s.id,e.target.value)} />
+              <span style={{fontSize:12}}>㎡</span>
+            </div>
+            <textarea className="stock-memo" rows={2} placeholder="メモ（現場名・日付など）" value={s.memo||''} onChange={e=>updateMemo(s.id,e.target.value)} />
+            <div className="stock-from" style={{marginTop:4}}>登録日：{s.date}</div>
+          </div>
+        ))
+      )}
     </div>
   );
 }
@@ -443,122 +906,63 @@ function ManualPanel({mode}) {
 // ============================================================
 // 発注書モーダル
 // ============================================================
-function OrderModal({ mode, steps, overrides, field, onClose }) {
-  const today = new Date().toLocaleDateString('ja-JP');
-  const [note, setNote] = useState('');
-  const [sampleKit, setSampleKit] = useState(false);
-  const [meister, setMeister] = useState('');
-  const [vendor, setVendor] = useState('');
-  const [delivDate, setDelivDate] = useState('');
-  const [colorNo, setColorNo] = useState('');
+function OrderModal({mode,steps,overrides,field,onClose}){
+  const today=new Date().toLocaleDateString('ja-JP');
+  const [note,setNote]=useState('');
+  const [sample,setSample]=useState(false);
+  const [meister,setMeister]=useState('');
+  const [vendor,setVendor]=useState('');
+  const [delivDate,setDelivDate]=useState('');
+  const [colorNo,setColorNo]=useState('');
 
-  const allRows = [];
-  steps.forEach(step => {
-    step.rows.forEach(row => {
-      const qty = overrides[row.key] !== undefined ? overrides[row.key] : row.qty;
-      if (qty > 0) allRows.push({ mat: row.mat, qty });
+  const allRows=[];
+  steps.forEach(step=>{
+    step.rows.forEach(row=>{
+      const qty=overrides[row.key]!==undefined?overrides[row.key]:row.qty;
+      if(qty>0) allRows.push({mat:row.mat,qty});
     });
   });
+  const totalEx=allRows.reduce((s,r)=>s+r.mat.price*r.qty,0);
 
-  const handlePrint = () => window.print();
-
-  return (
-    <div className="modal-overlay no-print" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="modal">
-        <div className="modal-header no-print">
-          <div className="modal-title">📋 発注書プレビュー</div>
-          <button className="modal-close" onClick={onClose}>×</button>
-        </div>
-
-        {/* 発注書本体 */}
-        <div className="order-doc" id="order-print">
+  return(
+    <div className="mo-ov no-print" onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="mo">
+        <div className="mo-hd no-print"><div className="mo-title">📋 発注書プレビュー</div><button className="mo-close" onClick={onClose}>×</button></div>
+        <div className="odoc" id="order-print">
           <h2>MURA WALL{mode==='exterior'?' EX':''} 現場専用 材料発注書</h2>
-          <div style={{textAlign:'right',fontSize:12,marginBottom:8}}>TK-0388 　発注日：{today}</div>
-
-          <div className="order-meta">
-            <div className="order-meta-item"><div className="order-meta-label">御社名</div><div className="order-meta-value">株式会社KENSIN</div></div>
-            <div className="order-meta-item"><div className="order-meta-label">ご担当者名</div><div className="order-meta-value">ぬーまん</div></div>
-            <div className="order-meta-item"><div className="order-meta-label">マイスター登録番号</div><div className="order-meta-value">{meister || '—'}</div></div>
-            <div className="order-meta-item"><div className="order-meta-label">サンプルキット</div><div className="order-meta-value">{sampleKit ? '要' : '不要'}</div></div>
-            <div className="order-meta-item"><div className="order-meta-label">施工物件名</div><div className="order-meta-value">{field.siteName || '（任意）'}</div></div>
-            <div className="order-meta-item"><div className="order-meta-label">施工物件住所</div><div className="order-meta-value">{field.siteAddr || '（任意）'}</div></div>
-            <div className="order-meta-item"><div className="order-meta-label">送り先・販売店</div><div className="order-meta-value">{vendor || '—'}</div></div>
-            <div className="order-meta-item"><div className="order-meta-label">希望納期</div><div className="order-meta-value">{delivDate || field.delivDate || '—'}</div></div>
+          <div style={{textAlign:'right',fontSize:11,marginBottom:7}}>TK-0388　発注日：{today}</div>
+          <div className="ometa">
+            <div className="ometa-item"><div className="ometa-lbl">御社名</div><div className="ometa-val">株式会社KENSIN</div></div>
+            <div className="ometa-item"><div className="ometa-lbl">ご担当者名</div><div className="ometa-val">ぬーまん</div></div>
+            <div className="ometa-item"><div className="ometa-lbl">マイスター登録番号</div><div className="ometa-val">{meister||'—'}</div></div>
+            <div className="ometa-item"><div className="ometa-lbl">サンプルキット</div><div className="ometa-val">{sample?'要':'不要'}</div></div>
+            <div className="ometa-item"><div className="ometa-lbl">施工物件名</div><div className="ometa-val">{field.siteName||'—'}</div></div>
+            <div className="ometa-item"><div className="ometa-lbl">施工物件住所</div><div className="ometa-val">{field.siteAddr||'—'}</div></div>
+            <div className="ometa-item"><div className="ometa-lbl">送り先・販売店</div><div className="ometa-val">{vendor||'—'}</div></div>
+            <div className="ometa-item"><div className="ometa-lbl">希望納期</div><div className="ometa-val">{delivDate||field.delivDate||'—'}</div></div>
           </div>
-
-          <table className="order-table">
-            <thead>
-              <tr>
-                <th>品名</th>
-                <th>色No./容量</th>
-                <th style={{textAlign:'right'}}>数量</th>
-                <th style={{textAlign:'right'}}>金額（税抜）</th>
-              </tr>
-            </thead>
+          <table className="otbl">
+            <thead><tr><th>品名</th><th>色No./容量</th><th style={{textAlign:'right'}}>数量</th><th style={{textAlign:'right'}}>金額（税抜）</th></tr></thead>
             <tbody>
-              {allRows.map((r, i) => (
-                <tr key={i}>
-                  <td>{r.mat.name}</td>
-                  <td>{colorNo && r.mat.name.includes('カラー') ? `No.${colorNo} / ` : ''}{r.mat.size}</td>
-                  <td style={{textAlign:'right'}}>{r.qty} {r.mat.unit}</td>
-                  <td style={{textAlign:'right'}}>¥{fmt(r.mat.price * r.qty)}</td>
-                </tr>
+              {allRows.map((r,i)=>(
+                <tr key={i}><td>{r.mat.name}</td><td>{colorNo&&r.mat.name.includes('カラー')?`No.${colorNo} / `:''}{r.mat.size}</td><td style={{textAlign:'right'}}>{r.qty} {r.mat.unit}</td><td style={{textAlign:'right'}}>¥{fmt(r.mat.price*r.qty)}</td></tr>
               ))}
             </tbody>
           </table>
-
-          <div className="order-total-area">
-            合計（税抜）：¥{fmt(allRows.reduce((s,r)=>s+r.mat.price*r.qty,0))}　／　
-            合計（税込）：¥{fmt(Math.round(allRows.reduce((s,r)=>s+r.mat.price*r.qty,0)*1.1))}
-          </div>
-
-          <div style={{marginTop:10}}>
-            <div style={{fontSize:12,fontWeight:600,marginBottom:4}}>備考</div>
-            <div className="order-note-box">{note || '（備考なし）'}</div>
-          </div>
-
-          {sampleKit && (
-            <div style={{marginTop:10,fontSize:12,background:'#fff8e1',padding:8,borderRadius:6}}>
-              【サンプルキット】45cm×45cm試し塗り用板2枚 / MURA WALL{mode==='exterior'?' EX':''}フィニッシュ150g×1缶
-            </div>
-          )}
+          <div className="ototal">合計（税抜）：¥{fmt(totalEx)}　／　合計（税込）：¥{fmt(Math.round(totalEx*1.1))}</div>
+          <div style={{marginTop:9}}><div style={{fontSize:12,fontWeight:600,marginBottom:3}}>備考</div><div className="onote">{note||'（備考なし）'}</div></div>
+          {sample&&<div style={{marginTop:9,fontSize:12,background:'#fff8e1',padding:8,borderRadius:6}}>【サンプルキット】45cm×45cm試し塗り用板2枚 / MURA WALL{mode==='exterior'?' EX':''}フィニッシュ150g×1缶</div>}
         </div>
-
-        {/* 編集フィールド（印刷では非表示） */}
-        <div className="no-print" style={{marginTop:16}}>
-          <div className="card-title" style={{fontSize:13,marginBottom:8}}>発注書の補足情報</div>
-          <div className="form-row-inline">
-            <div className="form-row">
-              <label className="form-label">色No.</label>
-              <input className="form-input" value={colorNo} onChange={e=>setColorNo(e.target.value)} placeholder="例：305" />
-            </div>
-            <div className="form-row">
-              <label className="form-label">希望納期</label>
-              <input className="form-input" type="date" value={delivDate} onChange={e=>setDelivDate(e.target.value)} />
-            </div>
-          </div>
-          <div className="form-row">
-            <label className="form-label">送り先・販売店名</label>
-            <input className="form-input" value={vendor} onChange={e=>setVendor(e.target.value)} placeholder="例：○○建材" />
-          </div>
-          <div className="form-row">
-            <label className="form-label">マイスター登録番号</label>
-            <input className="form-input" value={meister} onChange={e=>setMeister(e.target.value)} placeholder="登録番号を入力" />
-          </div>
-          <div className="form-row">
-            <label className="form-label">備考</label>
-            <textarea className="form-input" rows={3} value={note} onChange={e=>setNote(e.target.value)} placeholder="特記事項があれば入力" />
-          </div>
-          <div className="form-row" style={{display:'flex',alignItems:'center',gap:10}}>
-            <label style={{fontSize:13,fontWeight:600}}>サンプルキット</label>
-            <div className="radio-group" style={{flex:1}}>
-              <div className={`radio-btn${!sampleKit?' selected':''}`} onClick={()=>setSampleKit(false)}>不要</div>
-              <div className={`radio-btn${sampleKit?' selected':''}`} onClick={()=>setSampleKit(true)}>要</div>
-            </div>
-          </div>
-          <div className="btn-group" style={{marginTop:8}}>
-            <button className="btn btn-primary" onClick={handlePrint}>🖨️ PDF保存 / 印刷</button>
-            <button className="btn btn-gray" onClick={onClose}>閉じる</button>
+        <div className="no-print" style={{marginTop:14}}>
+          <div className="ctitle" style={{fontSize:13,marginBottom:8}}>補足情報</div>
+          <div className="frow-2"><div className="frow"><label className="flabel">色No.</label><input className="finput" value={colorNo} onChange={e=>setColorNo(e.target.value)} placeholder="例：305" /></div><div className="frow"><label className="flabel">希望納期</label><input className="finput" type="date" value={delivDate} onChange={e=>setDelivDate(e.target.value)} /></div></div>
+          <div className="frow"><label className="flabel">送り先・販売店名</label><input className="finput" value={vendor} onChange={e=>setVendor(e.target.value)} placeholder="例：○○建材" /></div>
+          <div className="frow"><label className="flabel">マイスター登録番号</label><input className="finput" value={meister} onChange={e=>setMeister(e.target.value)} placeholder="登録番号" /></div>
+          <div className="frow"><label className="flabel">備考</label><textarea className="finput" rows={3} value={note} onChange={e=>setNote(e.target.value)} placeholder="特記事項" /></div>
+          <div className="frow" style={{display:'flex',alignItems:'center',gap:10}}><label style={{fontSize:13,fontWeight:600,flexShrink:0}}>サンプルキット</label><div className="rbg" style={{flex:1}}><div className={`rb${!sample?' on':''}`} onClick={()=>setSample(false)}>不要</div><div className={`rb${sample?' on':''}`} onClick={()=>setSample(true)}>要</div></div></div>
+          <div className="btngrp" style={{marginTop:8}}>
+            <button className="btn btn-p" onClick={()=>window.print()}>🖨️ PDF保存 / 印刷</button>
+            <button className="btn btn-g" onClick={onClose}>閉じる</button>
           </div>
         </div>
       </div>
@@ -569,175 +973,207 @@ function OrderModal({ mode, steps, overrides, field, onClose }) {
 // ============================================================
 // メインアプリ
 // ============================================================
-function App() {
-  const [activeTab, setActiveTab] = useState('simulator'); // simulator | price | saves
-  const [mode, setMode] = useState('interior'); // interior | exterior
-  const [area, setArea] = useState('');
-  const [clear, setClear] = useState('none'); // none | gloss | matte
-  const [taxMode, setTaxMode] = useState('ex'); // ex | inc
-  const [overrides, setOverrides] = useState({});
-  const [showManual, setShowManual] = useState(false);
-  const [showPricePanel, setShowPricePanel] = useState(false);
-  const [showOrder, setShowOrder] = useState(false);
-  const [saves, setSaves] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('mw_saves') || '[]'); } catch { return []; }
-  });
-  const [field, setField] = useState({ siteName: '', siteAddr: '', delivDate: '' });
+function App(){
+  const [activeTab,setActiveTab]=useState('sim');
+  const [mode,setMode]=useState('interior');
+  const [area,setArea]=useState('');
+  const [clear,setClear]=useState('none');
+  const [taxMode,setTaxMode]=useState('ex');
+  const [overrides,setOverrides]=useState({});
+  const [field,setField]=useState({siteName:'',siteAddr:'',delivDate:''});
+  const [showManual,setShowManual]=useState(false);
+  const [showOrder,setShowOrder]=useState(false);
+  const [saves,setSaves]=useState(()=>{try{return JSON.parse(localStorage.getItem('mw_saves')||'[]')}catch{return[]}});
+  const [stocks,setStocks]=useState(()=>{try{return JSON.parse(localStorage.getItem('mw_stocks')||'[]')}catch{return[]}});
 
-  const areaNum = parseFloat(area) || 0;
+  // stocksをlocalStorageに同期
+  const updateStocks=(next)=>{
+    setStocks(next);
+    localStorage.setItem('mw_stocks',JSON.stringify(next));
+  };
 
-  const steps = useMemo(() => {
-    if (areaNum <= 0) return [];
-    return mode === 'interior' ? calcInterior(areaNum, clear) : calcExterior(areaNum, clear);
-  }, [areaNum, mode, clear]);
+  const areaNum=parseFloat(area)||0;
+  const steps=useMemo(()=>buildSteps(mode,areaNum,clear),[mode,areaNum,clear]);
+  const totals=useMemo(()=>calcTotals(steps,overrides,areaNum),[steps,overrides,areaNum]);
+  const displayTotal=taxMode==='inc'?Math.round(totals.purchase*1.1):totals.purchase;
+  const displayJob=taxMode==='inc'?Math.round(totals.jobCost*1.1):totals.jobCost;
 
-  const total = useMemo(() => calcTotal(steps, overrides), [steps, overrides]);
-  const displayTotal = taxMode === 'inc' ? Math.round(total * 1.1) : total;
-  const sqmPrice = areaNum > 0 ? Math.round(total / areaNum) : 0;
+  const getQty=(row)=>overrides[row.key]!==undefined?overrides[row.key]:row.qty;
 
-  const setQty = (key, delta) => {
-    setOverrides(prev => {
-      const baseQty = steps.flatMap(s=>s.rows).find(r=>r.key===key)?.qty || 0;
-      const cur = prev[key] !== undefined ? prev[key] : baseQty;
-      const next = Math.max(0, cur + delta);
-      return { ...prev, [key]: next };
+  const setQtyDelta=(key,d)=>{
+    setOverrides(prev=>{
+      const base=steps.flatMap(s=>s.rows).find(r=>r.key===key)?.qty||0;
+      const cur=prev[key]!==undefined?prev[key]:base;
+      return{...prev,[key]:Math.max(0,cur+d)};
     });
   };
+  const setQtyDirect=(key,val)=>{
+    const n=parseInt(val,10);
+    setOverrides(prev=>({...prev,[key]:isNaN(n)||n<0?0:n}));
+  };
 
-  const getQty = (row) => overrides[row.key] !== undefined ? overrides[row.key] : row.qty;
+  const handleModeChange=(m)=>{setMode(m);setOverrides({});};
 
-  const handleSave = () => {
-    if (!areaNum) return alert('施工面積を入力してください');
-    const item = {
-      id: Date.now(),
-      mode,
-      area: areaNum,
-      clear,
-      field: { ...field },
-      overrides: { ...overrides },
-      total,
-      date: new Date().toLocaleDateString('ja-JP'),
-      label: field.siteName || `${mode === 'interior' ? '内装' : '外装'} ${areaNum}㎡`,
+  const handleAddStock=(row,qty,sp)=>{
+    const m=row.mat;
+    const item={
+      id:Date.now()+Math.random(),
+      matName:m.name, matSize:m.size,
+      remainSqm:parseFloat(sp.surplusSqm.toFixed(1)),
+      unitValue:m.price/m.coverage,
+      fromSite:field.siteName||'現場名未入力',
+      date:new Date().toLocaleDateString('ja-JP'),
+      memo:'',
     };
-    const next = [item, ...saves].slice(0, 30);
+    updateStocks([item,...stocks].slice(0,50));
+    alert(`「${m.name}」を在庫に追加しました`);
+  };
+
+  const handleSave=()=>{
+    if(!areaNum){alert('施工面積を入力してください');return;}
+    const item={id:Date.now(),mode,area:areaNum,clear,field:{...field},overrides:{...overrides},total:totals.purchase,date:new Date().toLocaleDateString('ja-JP'),label:field.siteName||`${mode==='interior'?'内装':'外装'} ${areaNum}㎡`};
+    const next=[item,...saves].slice(0,30);
     setSaves(next);
-    localStorage.setItem('mw_saves', JSON.stringify(next));
+    localStorage.setItem('mw_saves',JSON.stringify(next));
     alert('保存しました');
   };
+  const handleLoad=(item)=>{setMode(item.mode);setArea(String(item.area));setClear(item.clear);setField(item.field);setOverrides(item.overrides);setActiveTab('sim');};
+  const handleDeleteSave=(id)=>{if(!confirm('削除しますか？'))return;const next=saves.filter(s=>s.id!==id);setSaves(next);localStorage.setItem('mw_saves',JSON.stringify(next));};
 
-  const handleLoad = (item) => {
-    setMode(item.mode);
-    setArea(String(item.area));
-    setClear(item.clear);
-    setField(item.field);
-    setOverrides(item.overrides);
-    setActiveTab('simulator');
+  const handleCopy=()=>{
+    const lines=steps.flatMap(s=>[s.title,...s.rows.map(r=>`  ${r.mat.name}（${r.mat.size}）× ${getQty(r)}${r.mat.unit}　¥${fmt(r.mat.price*getQty(r))}`)]);
+    lines.push(`\n合計（税抜）：¥${fmt(totals.purchase)}`);
+    if(totals.hasSurplus) lines.push(`この現場の実質費用：¥${fmt(totals.jobCost)}`);
+    navigator.clipboard.writeText(lines.join('\n'));
+    alert('コピーしました');
   };
 
-  const handleDelete = (id) => {
-    if (!confirm('この保存データを削除しますか？')) return;
-    const next = saves.filter(s => s.id !== id);
-    setSaves(next);
-    localStorage.setItem('mw_saves', JSON.stringify(next));
-  };
+  const sqmPrice=areaNum>0?Math.round((totals.hasSurplus?totals.jobCost:totals.purchase)/areaNum):0;
 
-  const handleModeChange = (m) => {
-    setMode(m);
-    setOverrides({});
-  };
-
-  return (
+  return(
     <div>
       {/* ヘッダー */}
-      <div className="header">
+      <div className="hdr">
         <h1>🏠 MURA WALL 材料費シミュレーター</h1>
         <p>Cement Artist Nu☆Man｜株式会社KENSIN</p>
       </div>
 
       {/* メインタブ */}
-      <div className="main-tabs no-print">
-        {[['simulator','⚙️ シミュレーター'],['price','💰 単価表'],['saves','📁 保存']].map(([k,l])=>(
-          <button key={k} className={`main-tab${activeTab===k?' active':''}`} onClick={()=>setActiveTab(k)}>{l}</button>
+      <div className="tabs no-print">
+        {[['sim','⚙️ シミュレーター'],['price','💰 単価表'],['stock',`📦 在庫(${stocks.length})`],['saves','📁 保存']].map(([k,l])=>(
+          <button key={k} className={`tab${activeTab===k?' on':''}`} onClick={()=>setActiveTab(k)}>{l}</button>
         ))}
       </div>
 
-      <div className="content">
+      <div className="wrap">
 
-        {/* ===== シミュレータータブ ===== */}
-        {activeTab === 'simulator' && (
+        {/* ===== シミュレーター ===== */}
+        {activeTab==='sim'&&(
           <>
-            {/* 内装/外装切り替え */}
+            {/* 製品選択 */}
             <div className="card">
-              <div className="card-title">製品選択</div>
-              <div className="radio-group">
-                <div className={`radio-btn${mode==='interior'?' selected':''}`} onClick={()=>handleModeChange('interior')}>内装 MURA WALL</div>
-                <div className={`radio-btn${mode==='exterior'?' selected':''}`} onClick={()=>handleModeChange('exterior')}>外装 MURA WALL EX</div>
+              <div className="ctitle">製品選択</div>
+              <div className="rbg">
+                <div className={`rb${mode==='interior'?' on':''}`} onClick={()=>handleModeChange('interior')}>内装 MURA WALL</div>
+                <div className={`rb${mode==='exterior'?' on':''}`} onClick={()=>handleModeChange('exterior')}>外装 MURA WALL EX</div>
               </div>
             </div>
 
             {/* 現場情報 */}
             <div className="card">
-              <div className="card-title">現場情報</div>
-              <div className="form-row">
-                <label className="form-label">施工物件名</label>
-                <input className="form-input" value={field.siteName} onChange={e=>setField({...field,siteName:e.target.value})} placeholder="例：○○様邸" />
-              </div>
-              <div className="form-row">
-                <label className="form-label">施工物件住所</label>
-                <input className="form-input" value={field.siteAddr} onChange={e=>setField({...field,siteAddr:e.target.value})} placeholder="例：三重県松阪市" />
-              </div>
-              <div className="form-row">
-                <label className="form-label">希望納期</label>
-                <input className="form-input" type="date" value={field.delivDate} onChange={e=>setField({...field,delivDate:e.target.value})} />
-              </div>
+              <div className="ctitle">現場情報</div>
+              <div className="frow"><label className="flabel">施工物件名</label><input className="finput" value={field.siteName} onChange={e=>setField({...field,siteName:e.target.value})} placeholder="例：○○様邸" /></div>
+              <div className="frow"><label className="flabel">施工物件住所</label><input className="finput" value={field.siteAddr} onChange={e=>setField({...field,siteAddr:e.target.value})} placeholder="例：三重県松阪市" /></div>
+              <div className="frow"><label className="flabel">希望納期</label><input className="finput" type="date" value={field.delivDate} onChange={e=>setField({...field,delivDate:e.target.value})} /></div>
             </div>
 
             {/* 施工条件 */}
             <div className="card">
-              <div className="card-title">施工条件</div>
-              <div className="form-row">
-                <label className="form-label">施工面積</label>
-                <div className="area-input-wrap">
-                  <input className="area-input" type="number" value={area} onChange={e=>{setArea(e.target.value);setOverrides({})}} placeholder="0" min="0" step="0.5" />
-                  <span className="area-unit">㎡</span>
+              <div className="ctitle">施工条件</div>
+              <div className="frow">
+                <label className="flabel">施工面積</label>
+                <div className="area-wrap">
+                  <input className="area-in" type="number" value={area} onChange={e=>{setArea(e.target.value);setOverrides({})}} placeholder="0" min="0" step="0.5" />
+                  <span style={{fontSize:18,fontWeight:600,color:'var(--text-sub)'}}>㎡</span>
                 </div>
               </div>
-              <div className="form-row">
-                <label className="form-label">クリヤー仕上げ（オプション）</label>
-                <div className="radio-group">
+              <div className="frow">
+                <label className="flabel">クリヤー仕上げ（オプション）</label>
+                <div className="rbg">
                   {[['none','なし'],['gloss','艶あり'],['matte','艶消し']].map(([k,l])=>(
-                    <div key={k} className={`radio-btn${clear===k?' selected':''}`} onClick={()=>setClear(k)}>{l}</div>
+                    <div key={k} className={`rb${clear===k?' on':''}`} onClick={()=>setClear(k)}>{l}</div>
                   ))}
                 </div>
-                {clear !== 'none' && mode === 'interior' && (
-                  <div className="warn-banner">
-                    <span className="icon">⚠️</span>
-                    <span>内装にクリヤーを使用すると<strong>国土交通大臣認定防火材料の対象外</strong>になります。ご注意ください。</span>
-                  </div>
+                {clear!=='none'&&mode==='interior'&&(
+                  <div className="warn"><span>⚠️</span><span>内装にクリヤーを使用すると<strong>国土交通大臣認定防火材料の対象外</strong>になります。</span></div>
                 )}
               </div>
             </div>
 
-            {/* 計算結果 */}
-            {areaNum > 0 && steps.length > 0 && (
+            {/* 材料リスト */}
+            {areaNum>0&&steps.length>0&&(
               <>
                 <div className="card">
-                  <div className="card-title">材料リスト（手動調整可）</div>
-                  {steps.map((step, si) => (
-                    <div className="result-step" key={si}>
-                      <div className="result-step-title">{step.title}</div>
-                      {step.rows.map((row, ri) => {
-                        const qty = getQty(row);
-                        return (
-                          <div className="result-row" key={ri}>
-                            <div className="result-name">{row.mat.name}<br/><span style={{fontSize:11,color:'#999'}}>{row.mat.size}</span></div>
-                            <div className="qty-adjust">
-                              <button className="qty-btn" onClick={()=>setQty(row.key, -1)}>−</button>
-                              <span className="qty-num">{qty}</span>
-                              <button className="qty-btn" onClick={()=>setQty(row.key, 1)}>+</button>
-                              <span style={{fontSize:12,color:'#999',marginLeft:2}}>{row.mat.unit}</span>
+                  <div className="ctitle">材料リスト（数量を直接編集できます）</div>
+                  {steps.map((step,si)=>(
+                    <div key={si} style={{marginBottom:14}}>
+                      <div style={{fontSize:12,fontWeight:700,color:'var(--text-sub)',marginBottom:7,padding:'4px 0',borderBottom:'1px solid var(--border)'}}>{step.title}</div>
+                      {step.rows.map((row,ri)=>{
+                        const qty=getQty(row);
+                        const m=row.mat;
+                        const covUnit=m.coverage;
+                        const covTotal=covUnit?covUnit*qty:null;
+                        const pct=covUnit&&covTotal?Math.min(100,areaNum/covTotal*100):null;
+                        const sp=calcSurplus(row,qty,areaNum);
+                        return(
+                          <div className="mat-card" key={ri}>
+                            <div className="mat-head">
+                              <div className="mat-name">
+                                <div className="name">{m.name}</div>
+                                <div className="size">{m.size}</div>
+                                {covUnit&&<div className="cov">1{m.unit}で {covUnit}㎡施工可能{covTotal?` ／ ${qty}${m.unit}で ${covTotal.toFixed(1)}㎡カバー`:''}</div>}
+                              </div>
+                              <div className="mat-ctrl">
+                                <button className="qbtn" onClick={()=>setQtyDelta(row.key,-1)}>−</button>
+                                <input
+                                  className="qinput"
+                                  type="number" min="0"
+                                  value={qty}
+                                  onChange={e=>setQtyDirect(row.key,e.target.value)}
+                                />
+                                <span className="qunit">{m.unit}</span>
+                                <button className="qbtn" onClick={()=>setQtyDelta(row.key,1)}>+</button>
+                              </div>
+                              <div className="mat-price">¥{fmt(m.price*qty)}</div>
                             </div>
-                            <div className="result-price">¥{fmt(row.mat.price * qty)}</div>
+
+                            {/* カバレッジバー */}
+                            {covUnit&&qty>0&&(
+                              <div className="cov-bar-wrap">
+                                <div className="cov-label">
+                                  <span>施工面積 {areaNum}㎡ に対して {covTotal?.toFixed(1)}㎡分購入</span>
+                                  <span>{pct?.toFixed(0)}%使用</span>
+                                </div>
+                                <div className="cov-bar">
+                                  <div className="cov-bar-fill over" style={{width:`${pct}%`}} />
+                                </div>
+                              </div>
+                            )}
+
+                            {/* 余り試算 */}
+                            {sp&&(
+                              <div className="surplus-box">
+                                <div className="surplus-title">
+                                  <span>📊 余り材料試算</span>
+                                  <span style={{fontSize:10,fontWeight:400,color:'#888'}}>購入 → 余りが次の現場へ</span>
+                                </div>
+                                <div className="surplus-row"><span className="surplus-label">購入合計</span><span className="surplus-val">¥{fmt(sp.cost)}</span></div>
+                                <div className="surplus-row"><span className="surplus-label">この現場の実質費用</span><span className="surplus-val green">¥{fmt(sp.jobCost)}</span></div>
+                                <div className="surplus-row"><span className="surplus-label">余り施工可能面積</span><span className="surplus-val gray">{sp.surplusSqm.toFixed(1)}㎡</span></div>
+                                <div className="surplus-row"><span className="surplus-label">余り材料の残存価値</span><span className="surplus-val gray">¥{fmt(sp.surplusVal)}</span></div>
+                                <button className="add-stock-btn" onClick={()=>handleAddStock(row,qty,sp)}>＋ 在庫に追加</button>
+                              </div>
+                            )}
                           </div>
                         );
                       })}
@@ -745,98 +1181,91 @@ function App() {
                   ))}
                 </div>
 
-                {/* 合計 */}
+                {/* 合計ボックス */}
                 <div className="total-box no-print">
-                  <div className="total-tax-toggle">
-                    <button className={`tax-btn${taxMode==='ex'?' active':''}`} onClick={()=>setTaxMode('ex')}>税抜</button>
-                    <button className={`tax-btn${taxMode==='inc'?' active':''}`} onClick={()=>setTaxMode('inc')}>税込（10%）</button>
+                  <div className="ttax">
+                    <button className={`ttax-btn${taxMode==='ex'?' on':''}`} onClick={()=>setTaxMode('ex')}>税抜</button>
+                    <button className={`ttax-btn${taxMode==='inc'?' on':''}`} onClick={()=>setTaxMode('inc')}>税込（10%）</button>
                   </div>
-                  <div className="total-row">
-                    <span className="total-label">合計金額</span>
-                    <span className="total-main">¥{fmt(displayTotal)}</span>
-                  </div>
-                  <div className="sqm-price">㎡単価（税抜）：¥{fmt(sqmPrice)}/㎡　｜　施工面積：{areaNum}㎡</div>
+                  <div className="trow"><span className="lbl">材料費（購入合計）</span><span className="val">¥{fmt(displayTotal)}</span></div>
+                  {totals.hasSurplus&&(
+                    <div className="surplus-summary">
+                      <div className="row"><span className="lbl">うち この現場の実質費用</span><span className="val">¥{fmt(displayJob)}</span></div>
+                      <div className="row"><span className="lbl">余り材料の残存価値</span><span className="val">¥{fmt(taxMode==='inc'?Math.round(totals.surplusVal*1.1):totals.surplusVal)}</span></div>
+                    </div>
+                  )}
+                  <div className="tdiv"/>
+                  <div className="trow"><span className="lbl">合計（{taxMode==='inc'?'税込':'税抜'}）</span><span className="val big">¥{fmt(displayTotal)}</span></div>
+                  {totals.hasSurplus&&(
+                    <div className="trow" style={{marginTop:8,background:'rgba(74,222,128,.15)',borderRadius:7,padding:'8px 10px'}}>
+                      <span style={{fontSize:13}}>✅ この現場の実質材料費</span>
+                      <span style={{fontSize:18,fontWeight:800,color:'#4ade80'}}>¥{fmt(displayJob)}</span>
+                    </div>
+                  )}
+                  <div className="tsqm">㎡単価（{totals.hasSurplus?'実質費用':'購入合計'}ベース）：¥{fmt(sqmPrice)}/㎡　｜　{areaNum}㎡</div>
                 </div>
 
                 {/* ボタン群 */}
-                <div className="btn-group no-print">
-                  <button className="btn btn-primary" onClick={()=>setShowOrder(true)}>📋 発注書を発行</button>
-                  <button className="btn btn-secondary" onClick={handleSave}>💾 保存</button>
+                <div className="btngrp no-print">
+                  <button className="btn btn-p" onClick={()=>setShowOrder(true)}>📋 発注書を発行</button>
+                  <button className="btn btn-s" onClick={handleSave}>💾 保存</button>
                 </div>
-                <div className="btn-group no-print">
-                  <button className="btn btn-gray" onClick={()=>{
-                    const lines = steps.flatMap(s=>[s.title,...s.rows.map(r=>`  ${r.mat.name}（${r.mat.size}）× ${getQty(r)}${r.mat.unit}　¥${fmt(r.mat.price*getQty(r))}`)]);
-                    lines.push(`\n合計（税抜）：¥${fmt(total)}`);
-                    navigator.clipboard.writeText(lines.join('\n'));
-                    alert('コピーしました');
-                  }}>📋 テキストコピー</button>
+                <div className="btngrp no-print">
+                  <button className="btn btn-g" onClick={handleCopy}>📋 テキストコピー</button>
                 </div>
               </>
             )}
 
             {/* 施工要領 */}
-            <div className="collapse-panel no-print">
-              <div className="collapse-header" onClick={()=>setShowManual(!showManual)}>
-                📖 施工要領を確認する
-                <span className={`arrow${showManual?' open':''}`}>▼</span>
+            <div className="coll no-print">
+              <div className="coll-hd" onClick={()=>setShowManual(!showManual)}>
+                📖 施工要領を確認する（詳細版）
+                <span className={`coll-arr${showManual?' op':''}`}>▼</span>
               </div>
-              {showManual && <div className="collapse-body"><ManualPanel mode={mode} /></div>}
+              {showManual&&<div className="coll-bd">{mode==='interior'?<ManualSection mode={mode}/>:<ManualSectionEX/>}</div>}
             </div>
           </>
         )}
 
-        {/* ===== 単価表タブ ===== */}
-        {activeTab === 'price' && (
+        {/* ===== 単価表 ===== */}
+        {activeTab==='price'&&(
+          <div className="card"><div className="ctitle">材料単価表（全材料）</div><PriceTab /></div>
+        )}
+
+        {/* ===== 在庫 ===== */}
+        {activeTab==='stock'&&(
           <div className="card">
-            <div className="card-title">材料単価表（全材料）</div>
-            <PriceTablePanel />
-            <div style={{fontSize:11,color:'#aaa',marginTop:10}}>※ 価格は税抜。㎡単価は標準施工面積の中央値で算出。</div>
+            <div className="ctitle">在庫一覧（余り材料）</div>
+            <StockTab stocks={stocks} setStocks={updateStocks} />
           </div>
         )}
 
-        {/* ===== 保存タブ ===== */}
-        {activeTab === 'saves' && (
+        {/* ===== 保存 ===== */}
+        {activeTab==='saves'&&(
           <div className="card">
-            <div className="card-title">保存済み現場（{saves.length}件）</div>
-            {saves.length === 0 ? (
-              <div className="empty-state">
-                <div className="icon">📭</div>
-                <div>保存済みのデータはありません</div>
-                <div style={{fontSize:12,marginTop:4}}>シミュレーター画面で「保存」ボタンを押してください</div>
-              </div>
-            ) : (
-              <div className="save-list">
-                {saves.map(item => (
-                  <div className="save-item" key={item.id}>
-                    <div className="save-item-info">
-                      <div className="save-item-name">{item.label}</div>
-                      <div className="save-item-meta">
-                        {item.mode === 'interior' ? '内装' : '外装'} / {item.area}㎡ / 合計¥{fmt(item.total)} / {item.date}
-                      </div>
-                    </div>
-                    <div className="save-item-actions">
-                      <button className="icon-btn" onClick={()=>handleLoad(item)}>読込</button>
-                      <button className="icon-btn danger" onClick={()=>handleDelete(item.id)}>削除</button>
-                    </div>
+            <div className="ctitle">保存済み現場（{saves.length}件）</div>
+            {saves.length===0?(
+              <div className="empty"><div className="ico">📭</div><div>保存済みデータはありません</div></div>
+            ):(
+              saves.map(item=>(
+                <div key={item.id} style={{background:'#fff',border:'1.5px solid var(--border)',borderRadius:8,padding:12,marginBottom:9,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                  <div>
+                    <div style={{fontWeight:600,fontSize:14}}>{item.label}</div>
+                    <div style={{fontSize:12,color:'var(--text-sub)',marginTop:2}}>{item.mode==='interior'?'内装':'外装'} / {item.area}㎡ / ¥{fmt(item.total)} / {item.date}</div>
                   </div>
-                ))}
-              </div>
+                  <div style={{display:'flex',gap:6}}>
+                    <button style={{padding:'6px 10px',border:'1.5px solid var(--border)',borderRadius:6,background:'#fff',fontSize:12,cursor:'pointer'}} onClick={()=>handleLoad(item)}>読込</button>
+                    <button style={{padding:'6px 10px',border:'1.5px solid #fecaca',borderRadius:6,background:'#fff',fontSize:12,cursor:'pointer',color:'var(--red)'}} onClick={()=>handleDeleteSave(item.id)}>削除</button>
+                  </div>
+                </div>
+              ))
             )}
           </div>
         )}
-
       </div>
 
       {/* 発注書モーダル */}
-      {showOrder && (
-        <OrderModal
-          mode={mode}
-          steps={steps}
-          overrides={overrides}
-          field={field}
-          onClose={()=>setShowOrder(false)}
-        />
-      )}
+      {showOrder&&<OrderModal mode={mode} steps={steps} overrides={overrides} field={field} onClose={()=>setShowOrder(false)} />}
     </div>
   );
 }
