@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MURA WALL 材料費シミュレーター | Cement Artist Nu☆Man</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  :root {
+    --brand: #f18200;
+    --brand-light: #fff4e6;
+    --brand-dark: #c96800;
+    --text: #1a1a1a;
+    --text-sub: #666;
+    --border: #e0e0e0;
+    --bg: #fafafa;
+    --bg-white: #ffffff;
+    --success: #2d8a4e;
+    --warning: #d97706;
+    --danger: #dc2626;
+    --radius: 10px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); font-size: 15px; }
+
+  /* ヘッダー */
+  .header { background: var(--brand); color: #fff; padding: 14px 16px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(241,130,0,0.3); }
+  .header h1 { font-size: 17px; font-weight: 700; letter-spacing: 0.02em; }
+  .header p { font-size: 11px; opacity: 0.85; margin-top: 2px; }
+
+  /* メインタブ */
+  .main-tabs { display: flex; background: #fff; border-bottom: 2px solid var(--border); overflow-x: auto; }
+  .main-tab { flex: 1; min-width: 80px; padding: 12px 8px; text-align: center; font-size: 13px; font-weight: 600; color: var(--text-sub); cursor: pointer; border: none; background: none; white-space: nowrap; border-bottom: 3px solid transparent; transition: all 0.2s; }
+  .main-tab.active { color: var(--brand); border-bottom-color: var(--brand); }
+
+  /* コンテンツ */
+  .content { max-width: 640px; margin: 0 auto; padding: 16px; }
+
+  /* カード */
+  .card { background: var(--bg-white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; margin-bottom: 14px; }
+  .card-title { font-size: 13px; font-weight: 700; color: var(--brand); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+  .card-title::before { content: ''; display: inline-block; width: 4px; height: 16px; background: var(--brand); border-radius: 2px; }
+
+  /* 入力フォーム */
+  .form-row { margin-bottom: 12px; }
+  .form-label { font-size: 12px; font-weight: 600; color: var(--text-sub); margin-bottom: 5px; display: block; }
+  .form-input { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 15px; font-family: inherit; transition: border-color 0.2s; background: #fff; }
+  .form-input:focus { outline: none; border-color: var(--brand); }
+  .form-row-inline { display: flex; gap: 10px; }
+  .form-row-inline .form-row { flex: 1; }
+
+  /* 面積入力 */
+  .area-input-wrap { display: flex; align-items: center; gap: 8px; }
+  .area-input { font-size: 22px; font-weight: 700; text-align: right; width: 140px; padding: 10px 12px; border: 2px solid var(--border); border-radius: 8px; color: var(--brand); }
+  .area-input:focus { outline: none; border-color: var(--brand); }
+  .area-unit { font-size: 18px; font-weight: 600; color: var(--text-sub); }
+
+  /* クリヤー選択 */
+  .radio-group { display: flex; gap: 8px; flex-wrap: wrap; }
+  .radio-btn { flex: 1; min-width: 70px; padding: 9px 6px; border: 1.5px solid var(--border); border-radius: 8px; text-align: center; font-size: 13px; font-weight: 600; cursor: pointer; background: #fff; color: var(--text-sub); transition: all 0.2s; }
+  .radio-btn.selected { border-color: var(--brand); background: var(--brand-light); color: var(--brand); }
+
+  /* 警告バナー */
+  .warn-banner { background: #fff8e1; border: 1px solid #fbbf24; border-radius: 8px; padding: 10px 12px; font-size: 12px; color: #92400e; margin-top: 10px; display: flex; gap: 8px; align-items: flex-start; }
+  .warn-banner .icon { flex-shrink: 0; }
+
+  /* 計算結果 */
+  .result-section { margin-bottom: 10px; }
+  .result-step { background: #f9f9f9; border-radius: 8px; padding: 12px; margin-bottom: 8px; }
+  .result-step-title { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .result-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); }
+  .result-row:last-child { border-bottom: none; }
+  .result-name { font-size: 14px; color: var(--text); flex: 1; }
+  .result-qty { font-size: 14px; font-weight: 600; color: var(--text); min-width: 60px; text-align: right; margin-right: 12px; }
+  .result-price { font-size: 14px; font-weight: 600; color: var(--text); min-width: 80px; text-align: right; }
+
+  /* 手動調整 */
+  .qty-adjust { display: flex; align-items: center; gap: 6px; }
+  .qty-btn { width: 26px; height: 26px; border: 1.5px solid var(--border); border-radius: 6px; background: #fff; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-sub); font-weight: 700; }
+  .qty-btn:active { background: var(--brand-light); }
+  .qty-num { font-size: 15px; font-weight: 700; min-width: 28px; text-align: center; color: var(--brand); }
+
+  /* 合計ボックス */
+  .total-box { background: var(--text); color: #fff; border-radius: var(--radius); padding: 18px; margin-bottom: 14px; }
+  .total-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .total-label { font-size: 13px; opacity: 0.75; }
+  .total-value { font-size: 18px; font-weight: 700; }
+  .total-main { font-size: 26px; font-weight: 800; color: var(--brand); }
+  .total-tax-toggle { display: flex; gap: 6px; margin-bottom: 14px; }
+  .tax-btn { flex: 1; padding: 8px; border: 1.5px solid #444; border-radius: 8px; background: transparent; color: #aaa; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .tax-btn.active { border-color: var(--brand); background: var(--brand); color: #fff; }
+  .sqm-price { font-size: 13px; opacity: 0.7; text-align: right; margin-top: 6px; }
+
+  /* ボタン群 */
+  .btn-group { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+  .btn { flex: 1; min-width: 100px; padding: 13px 10px; border: none; border-radius: var(--radius); font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .btn-primary { background: var(--brand); color: #fff; }
+  .btn-primary:active { background: var(--brand-dark); }
+  .btn-secondary { background: #fff; color: var(--brand); border: 2px solid var(--brand); }
+  .btn-secondary:active { background: var(--brand-light); }
+  .btn-gray { background: #f0f0f0; color: var(--text-sub); }
+  .btn-gray:active { background: #e0e0e0; }
+
+  /* 折り畳みパネル */
+  .collapse-panel { background: #fff; border: 1.5px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; overflow: hidden; }
+  .collapse-header { display: flex; justify-content: space-between; align-items: center; padding: 13px 16px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--text); }
+  .collapse-header .arrow { transition: transform 0.2s; color: var(--brand); font-size: 12px; }
+  .collapse-header .arrow.open { transform: rotate(180deg); }
+  .collapse-body { padding: 0 16px 16px; }
+
+  /* 単価表 */
+  .price-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .price-table th { background: var(--brand-light); color: var(--brand-dark); font-weight: 700; padding: 8px 10px; text-align: left; border-bottom: 2px solid var(--brand); }
+  .price-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  .price-table tr:last-child td { border-bottom: none; }
+  .price-table tr:nth-child(even) td { background: #fafafa; }
+  .section-divider { font-size: 12px; font-weight: 700; color: var(--text-sub); padding: 10px 10px 4px; background: #f5f5f5; letter-spacing: 0.05em; }
+
+  /* 施工要領 */
+  .manual-section { margin-bottom: 14px; }
+  .manual-title { font-size: 13px; font-weight: 700; color: var(--brand-dark); margin-bottom: 6px; }
+  .manual-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 8px; }
+  .manual-table th { background: #f0f0f0; padding: 6px 8px; text-align: left; font-weight: 600; }
+  .manual-table td { padding: 6px 8px; border-bottom: 1px solid var(--border); }
+  .manual-note { font-size: 12px; color: var(--text-sub); line-height: 1.6; background: #f9f9f9; border-radius: 6px; padding: 10px; }
+  .manual-note li { margin-left: 16px; margin-bottom: 4px; }
+
+  /* 発注書モーダル */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: flex; align-items: flex-end; justify-content: center; }
+  .modal { background: #fff; border-radius: 16px 16px 0 0; width: 100%; max-width: 640px; max-height: 92vh; overflow-y: auto; padding: 20px 16px; }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .modal-title { font-size: 17px; font-weight: 700; }
+  .modal-close { font-size: 24px; cursor: pointer; color: var(--text-sub); background: none; border: none; }
+
+  /* 発注書プレビュー */
+  .order-doc { border: 2px solid var(--text); border-radius: 8px; padding: 16px; font-size: 13px; }
+  .order-doc h2 { text-align: center; font-size: 16px; margin-bottom: 12px; border-bottom: 2px solid var(--text); padding-bottom: 8px; }
+  .order-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px; font-size: 12px; }
+  .order-meta-item { border: 1px solid #ccc; padding: 6px 8px; border-radius: 4px; }
+  .order-meta-label { font-size: 10px; color: var(--text-sub); }
+  .order-meta-value { font-weight: 600; }
+  .order-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 10px; }
+  .order-table th { background: #333; color: #fff; padding: 6px 8px; text-align: left; }
+  .order-table td { padding: 7px 8px; border-bottom: 1px solid #ddd; }
+  .order-table tr:nth-child(even) td { background: #f9f9f9; }
+  .order-note-box { border: 1px solid #ccc; border-radius: 6px; padding: 10px; min-height: 60px; font-size: 12px; color: var(--text-sub); }
+  .order-total-area { background: #f5f5f5; border-radius: 6px; padding: 10px; text-align: right; font-size: 14px; font-weight: 700; margin-top: 8px; }
+
+  /* 保存リスト */
+  .save-list { display: flex; flex-direction: column; gap: 8px; }
+  .save-item { background: #fff; border: 1.5px solid var(--border); border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center; }
+  .save-item-info { flex: 1; }
+  .save-item-name { font-weight: 600; font-size: 14px; }
+  .save-item-meta { font-size: 12px; color: var(--text-sub); margin-top: 2px; }
+  .save-item-actions { display: flex; gap: 6px; }
+  .icon-btn { padding: 6px 10px; border: 1.5px solid var(--border); border-radius: 6px; background: #fff; font-size: 12px; cursor: pointer; color: var(--text-sub); }
+  .icon-btn.danger { border-color: #fecaca; color: var(--danger); }
+
+  /* 空状態 */
+  .empty-state { text-align: center; padding: 30px 16px; color: var(--text-sub); }
+  .empty-state .icon { font-size: 36px; margin-bottom: 8px; }
+
+  /* 印刷用 */
+  @media print {
+    .no-print { display: none !important; }
+    .modal-overlay { position: static; background: none; }
+    .modal { max-height: none; border-radius: 0; padding: 0; }
+    body { background: #fff; }
+  }
+
+  @media (min-width: 600px) {
+    .content { padding: 20px; }
+    .area-input { width: 180px; font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useCallback, useMemo } = React;
+
+// ============================================================
+// 材料マスターデータ
+// ============================================================
+const MATERIALS = {
+  // 内装
+  pate:      { name: 'FCクイックパテ',       unit: '袋', size: '3.5kg/袋',    price: 1460,  coverage: 62.5 },
+  tape:      { name: 'ファイバーテープ',      unit: '巻', size: '50mm×90m/巻', price: 1770,  coverage: 60 },
+  under:     { name: 'ベストアンダー',        unit: '袋', size: '3.3kg/袋',    price: 1770,  coverage: 3.3 },
+  mwMain:    { name: 'MURA WALL 主材',       unit: '袋', size: '3.875kg/セット',price: 3960, coverage: 4.5 },
+  mwColor:   { name: 'MURA WALL カラー',     unit: '袋', size: '100g/袋',      price: 780,  coverage: null },
+  mwFin:     { name: 'MURA WALL フィニッシュ',unit: '缶', size: '3kg/缶',       price: 9720, coverage: 12.5 },
+  // 外装
+  sealerS:   { name: 'シーラーW',            unit: '缶', size: '4kg/缶',       price: 4320,  coverage: 33.3 },
+  sealerL:   { name: 'シーラーW',            unit: '缶', size: '15kg/缶',      price: 11930, coverage: 125 },
+  exMain:    { name: 'MURA WALL EX 主材',    unit: '袋', size: '5.2kg/セット', price: 4200,  coverage: 4.5 },
+  exColor:   { name: 'MURA WALL EX カラー',  unit: '袋', size: '100g/袋',      price: 780,  coverage: null },
+  exFin:     { name: 'MURA WALL EX フィニッシュ',unit:'缶',size:'3kg/缶',      price:10320,  coverage: 10 },
+  // クリヤー（共通）
+  clearGlossS:  { name: 'MURA WALL クリヤー 艶あり', unit: '缶', size: '2kg/缶',  price: 2880,  coverage: 10 },
+  clearGlossL:  { name: 'MURA WALL クリヤー 艶あり', unit: '缶', size: '16kg/缶', price: 20520, coverage: 80 },
+  clearMatteS:  { name: 'MURA WALL クリヤー 艶消し', unit: '缶', size: '2kg/缶',  price: 3600,  coverage: 10 },
+  clearMatteL:  { name: 'MURA WALL クリヤー 艶消し', unit: '缶', size: '16kg/缶', price: 26520, coverage: 80 },
+};
+
+// ============================================================
+// 計算ロジック
+// ============================================================
+function calcClear(area, type) {
+  if (type === 'none') return [];
+  const sKey = type === 'gloss' ? 'clearGlossS' : 'clearMatteS';
+  const lKey = type === 'gloss' ? 'clearGlossL' : 'clearMatteL';
+  const mS = MATERIALS[sKey], mL = MATERIALS[lKey];
+  const large = Math.floor(area / 80);
+  const remain = area - large * 80;
+  const small = remain > 0 ? Math.ceil(remain / 10) : 0;
+  const rows = [];
+  if (large > 0) rows.push({ key: lKey, mat: mL, qty: large });
+  if (small > 0) rows.push({ key: sKey, mat: mS, qty: small });
+  return rows;
+}
+
+function calcSealer(area) {
+  const mS = MATERIALS.sealerS, mL = MATERIALS.sealerL;
+  // コスパ比較（㎡単価）
+  const unitS = mS.price / mS.coverage;
+  const unitL = mL.price / mL.coverage;
+  if (unitL <= unitS) {
+    const large = Math.floor(area / 125);
+    const remain = area - large * 125;
+    const small = remain > 0 ? Math.ceil(remain / 33.3) : 0;
+    const rows = [];
+    if (large > 0) rows.push({ key: 'sealerL', mat: mL, qty: large });
+    if (small > 0) rows.push({ key: 'sealerS', mat: mS, qty: small });
+    return rows;
+  } else {
+    return [{ key: 'sealerS', mat: mS, qty: Math.ceil(area / 33.3) }];
+  }
+}
+
+function calcInterior(area, clear) {
+  const steps = [];
+  // 工程1: 下地処理
+  steps.push({
+    title: '工程1｜下地処理（石膏ボード）',
+    rows: [
+      { key: 'pate', mat: MATERIALS.pate, qty: Math.ceil(area / 62.5) },
+      { key: 'tape', mat: MATERIALS.tape, qty: Math.ceil(area / 60) },
+    ]
+  });
+  // 工程2: 下塗り
+  steps.push({
+    title: '工程2｜下塗り',
+    rows: [{ key: 'under', mat: MATERIALS.under, qty: Math.ceil(area / 3.3) }]
+  });
+  // 工程3: 主材
+  const mainQty = Math.ceil(area / 4.5);
+  steps.push({
+    title: '工程3｜主材塗り（MURA WALL）',
+    rows: [
+      { key: 'mwMain',  mat: MATERIALS.mwMain,  qty: mainQty },
+      { key: 'mwColor', mat: MATERIALS.mwColor, qty: mainQty },
+    ]
+  });
+  // 工程4: フィニッシュ
+  const finQty = Math.ceil(area / 12.5);
+  steps.push({
+    title: '工程4｜フィニッシュ（MURA WALL）',
+    rows: [
+      { key: 'mwFin',   mat: MATERIALS.mwFin,   qty: finQty },
+      { key: 'mwColor', mat: MATERIALS.mwColor, qty: finQty },
+    ]
+  });
+  // 工程5: クリヤー（オプション）
+  const clearRows = calcClear(area, clear);
+  if (clearRows.length > 0) {
+    steps.push({ title: '工程5｜クリヤー仕上げ（オプション）', rows: clearRows });
+  }
+  return steps;
+}
+
+function calcExterior(area, clear) {
+  const steps = [];
+  // 工程1: シーラー
+  steps.push({ title: '工程1｜下塗り（シーラーW）', rows: calcSealer(area) });
+  // 工程2: 主材
+  const mainQty = Math.ceil(area / 4.5);
+  steps.push({
+    title: '工程2｜主材塗り（MURA WALL EX）',
+    rows: [
+      { key: 'exMain',  mat: MATERIALS.exMain,  qty: mainQty },
+      { key: 'exColor', mat: MATERIALS.exColor, qty: mainQty },
+    ]
+  });
+  // 工程3: フィニッシュ
+  const finQty = Math.ceil(area / 10);
+  steps.push({
+    title: '工程3｜フィニッシュ（MURA WALL EX）',
+    rows: [
+      { key: 'exFin',   mat: MATERIALS.exFin,   qty: finQty },
+      { key: 'exColor', mat: MATERIALS.exColor, qty: finQty },
+    ]
+  });
+  // 工程4: クリヤー（オプション）
+  const clearRows = calcClear(area, clear);
+  if (clearRows.length > 0) {
+    steps.push({ title: '工程4｜クリヤー仕上げ（オプション）', rows: clearRows });
+  }
+  return steps;
+}
+
+function calcTotal(steps, overrides) {
+  let total = 0;
+  steps.forEach(step => {
+    step.rows.forEach(row => {
+      const qty = overrides[row.key] !== undefined ? overrides[row.key] : row.qty;
+      total += row.mat.price * qty;
+    });
+  });
+  return total;
+}
+
+const fmt = n => n.toLocaleString('ja-JP');
+
+// ============================================================
+// 単価表コンポーネント
+// ============================================================
+function PriceTablePanel() {
+  const sections = [
+    { label: '内装 MURA WALL — 下地処理', keys: ['pate','tape'] },
+    { label: '内装 MURA WALL — 下塗り', keys: ['under'] },
+    { label: '内装 MURA WALL — 主材・フィニッシュ', keys: ['mwMain','mwColor','mwFin'] },
+    { label: '外装 MURA WALL EX — 下塗りシーラー', keys: ['sealerS','sealerL'] },
+    { label: '外装 MURA WALL EX — 主材・フィニッシュ', keys: ['exMain','exColor','exFin'] },
+    { label: 'クリヤー仕上げ（内外共通）', keys: ['clearGlossS','clearGlossL','clearMatteS','clearMatteL'] },
+  ];
+  return (
+    <div>
+      {sections.map(sec => (
+        <div key={sec.label} style={{marginBottom:14}}>
+          <div style={{fontSize:11,fontWeight:700,color:'#888',padding:'6px 0',textTransform:'uppercase',letterSpacing:'0.05em',borderBottom:'1px solid #eee',marginBottom:4}}>
+            {sec.label}
+          </div>
+          <table className="price-table" style={{width:'100%'}}>
+            <thead>
+              <tr>
+                <th>品名</th>
+                <th>容量</th>
+                <th style={{textAlign:'right'}}>単価（税抜）</th>
+                <th style={{textAlign:'right'}}>㎡単価</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sec.keys.map(k => {
+                const m = MATERIALS[k];
+                const sqm = m.coverage ? `¥${fmt(Math.round(m.price/m.coverage))}/㎡` : '—';
+                return (
+                  <tr key={k+m.size}>
+                    <td>{m.name}</td>
+                    <td>{m.size}</td>
+                    <td style={{textAlign:'right',fontWeight:600}}>¥{fmt(m.price)}</td>
+                    <td style={{textAlign:'right',color:'#888'}}>{sqm}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ============================================================
+// 施工要領コンポーネント
+// ============================================================
+function ManualPanel({mode}) {
+  if (mode === 'interior') return (
+    <div>
+      <div className="manual-section">
+        <div className="manual-title">■ 下地処理（石膏ボード）</div>
+        <ul className="manual-note"><li>FCクイックパテをジョイント部・ビス凹みへしごき込み（2時間以上乾燥）</li><li>ファイバーテープをジョイント・出隅入隅に貼付後、パテ上塗り</li><li>全面にベストアンダーを1mm厚で塗布（24時間以上乾燥）</li></ul>
+      </div>
+      <div className="manual-section">
+        <div className="manual-title">■ 主材（MURA WALL）調合比 / 4〜5㎡</div>
+        <table className="manual-table"><thead><tr><th>材料</th><th>調合量</th></tr></thead>
+          <tbody>
+            <tr><td>MURA WALL 主材</td><td>3.6kg</td></tr>
+            <tr><td>添付ボンド（セット内蔵）</td><td>0.275kg</td></tr>
+            <tr><td>MURA WALL カラー</td><td>0.1kg（1袋）</td></tr>
+            <tr><td>清水</td><td>1.7L</td></tr>
+          </tbody>
+        </table>
+        <div className="manual-note" style={{marginTop:6}}>塗り厚1mm・1回塗り。ベストアンダー完全乾燥後に施工。</div>
+      </div>
+      <div className="manual-section">
+        <div className="manual-title">■ フィニッシュ（MURA WALL）調合比 / 10〜15㎡</div>
+        <table className="manual-table"><thead><tr><th>材料</th><th>調合量</th></tr></thead>
+          <tbody>
+            <tr><td>MURA WALL フィニッシュ</td><td>3.0kg</td></tr>
+            <tr><td>MURA WALL カラー</td><td>0.1kg（1袋）</td></tr>
+          </tbody>
+        </table>
+        <div className="manual-note" style={{marginTop:6}}>主材完全乾燥後（24時間以上）に施工。撹拌しすぎると柄が崩れるため注意。</div>
+      </div>
+    </div>
+  );
+  return (
+    <div>
+      <div className="manual-section">
+        <div className="manual-title">■ シーラーW（下塗り）</div>
+        <ul className="manual-note"><li>原液をそのまま使用（水で希釈しない）</li><li>VPローラー中毛またはエアレスで全面塗布（0.1〜0.15kg/㎡）</li><li>3時間以上乾燥させてから主材を塗布する</li></ul>
+      </div>
+      <div className="manual-section">
+        <div className="manual-title">■ 主材（MURA WALL EX）調合比 / 4〜5㎡</div>
+        <table className="manual-table"><thead><tr><th>材料</th><th>調合量</th></tr></thead>
+          <tbody>
+            <tr><td>MURA WALL EX 主材</td><td>4.0kg</td></tr>
+            <tr><td>専用ボンド（セット内蔵）</td><td>1.2kg</td></tr>
+            <tr><td>MURA WALL EX カラー</td><td>0.1kg（1袋）</td></tr>
+            <tr><td>清水</td><td>1.2L</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div className="manual-section">
+        <div className="manual-title">■ フィニッシュ（MURA WALL EX）調合比 / 10㎡</div>
+        <table className="manual-table"><thead><tr><th>材料</th><th>調合量</th></tr></thead>
+          <tbody>
+            <tr><td>MURA WALL EX フィニッシュ</td><td>3.0kg</td></tr>
+            <tr><td>MURA WALL EX カラー</td><td>0.1kg（1袋）</td></tr>
+          </tbody>
+        </table>
+        <div className="manual-note" style={{marginTop:6}}>主材完全乾燥後（24時間以上）に施工。</div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// 発注書モーダル
+// ============================================================
+function OrderModal({ mode, steps, overrides, field, onClose }) {
+  const today = new Date().toLocaleDateString('ja-JP');
+  const [note, setNote] = useState('');
+  const [sampleKit, setSampleKit] = useState(false);
+  const [meister, setMeister] = useState('');
+  const [vendor, setVendor] = useState('');
+  const [delivDate, setDelivDate] = useState('');
+  const [colorNo, setColorNo] = useState('');
+
+  const allRows = [];
+  steps.forEach(step => {
+    step.rows.forEach(row => {
+      const qty = overrides[row.key] !== undefined ? overrides[row.key] : row.qty;
+      if (qty > 0) allRows.push({ mat: row.mat, qty });
+    });
+  });
+
+  const handlePrint = () => window.print();
+
+  return (
+    <div className="modal-overlay no-print" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal">
+        <div className="modal-header no-print">
+          <div className="modal-title">📋 発注書プレビュー</div>
+          <button className="modal-close" onClick={onClose}>×</button>
+        </div>
+
+        {/* 発注書本体 */}
+        <div className="order-doc" id="order-print">
+          <h2>MURA WALL{mode==='exterior'?' EX':''} 現場専用 材料発注書</h2>
+          <div style={{textAlign:'right',fontSize:12,marginBottom:8}}>TK-0388 　発注日：{today}</div>
+
+          <div className="order-meta">
+            <div className="order-meta-item"><div className="order-meta-label">御社名</div><div className="order-meta-value">株式会社KENSIN</div></div>
+            <div className="order-meta-item"><div className="order-meta-label">ご担当者名</div><div className="order-meta-value">ぬーまん</div></div>
+            <div className="order-meta-item"><div className="order-meta-label">マイスター登録番号</div><div className="order-meta-value">{meister || '—'}</div></div>
+            <div className="order-meta-item"><div className="order-meta-label">サンプルキット</div><div className="order-meta-value">{sampleKit ? '要' : '不要'}</div></div>
+            <div className="order-meta-item"><div className="order-meta-label">施工物件名</div><div className="order-meta-value">{field.siteName || '（任意）'}</div></div>
+            <div className="order-meta-item"><div className="order-meta-label">施工物件住所</div><div className="order-meta-value">{field.siteAddr || '（任意）'}</div></div>
+            <div className="order-meta-item"><div className="order-meta-label">送り先・販売店</div><div className="order-meta-value">{vendor || '—'}</div></div>
+            <div className="order-meta-item"><div className="order-meta-label">希望納期</div><div className="order-meta-value">{delivDate || field.delivDate || '—'}</div></div>
+          </div>
+
+          <table className="order-table">
+            <thead>
+              <tr>
+                <th>品名</th>
+                <th>色No./容量</th>
+                <th style={{textAlign:'right'}}>数量</th>
+                <th style={{textAlign:'right'}}>金額（税抜）</th>
+              </tr>
+            </thead>
+            <tbody>
+              {allRows.map((r, i) => (
+                <tr key={i}>
+                  <td>{r.mat.name}</td>
+                  <td>{colorNo && r.mat.name.includes('カラー') ? `No.${colorNo} / ` : ''}{r.mat.size}</td>
+                  <td style={{textAlign:'right'}}>{r.qty} {r.mat.unit}</td>
+                  <td style={{textAlign:'right'}}>¥{fmt(r.mat.price * r.qty)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <div className="order-total-area">
+            合計（税抜）：¥{fmt(allRows.reduce((s,r)=>s+r.mat.price*r.qty,0))}　／　
+            合計（税込）：¥{fmt(Math.round(allRows.reduce((s,r)=>s+r.mat.price*r.qty,0)*1.1))}
+          </div>
+
+          <div style={{marginTop:10}}>
+            <div style={{fontSize:12,fontWeight:600,marginBottom:4}}>備考</div>
+            <div className="order-note-box">{note || '（備考なし）'}</div>
+          </div>
+
+          {sampleKit && (
+            <div style={{marginTop:10,fontSize:12,background:'#fff8e1',padding:8,borderRadius:6}}>
+              【サンプルキット】45cm×45cm試し塗り用板2枚 / MURA WALL{mode==='exterior'?' EX':''}フィニッシュ150g×1缶
+            </div>
+          )}
+        </div>
+
+        {/* 編集フィールド（印刷では非表示） */}
+        <div className="no-print" style={{marginTop:16}}>
+          <div className="card-title" style={{fontSize:13,marginBottom:8}}>発注書の補足情報</div>
+          <div className="form-row-inline">
+            <div className="form-row">
+              <label className="form-label">色No.</label>
+              <input className="form-input" value={colorNo} onChange={e=>setColorNo(e.target.value)} placeholder="例：305" />
+            </div>
+            <div className="form-row">
+              <label className="form-label">希望納期</label>
+              <input className="form-input" type="date" value={delivDate} onChange={e=>setDelivDate(e.target.value)} />
+            </div>
+          </div>
+          <div className="form-row">
+            <label className="form-label">送り先・販売店名</label>
+            <input className="form-input" value={vendor} onChange={e=>setVendor(e.target.value)} placeholder="例：○○建材" />
+          </div>
+          <div className="form-row">
+            <label className="form-label">マイスター登録番号</label>
+            <input className="form-input" value={meister} onChange={e=>setMeister(e.target.value)} placeholder="登録番号を入力" />
+          </div>
+          <div className="form-row">
+            <label className="form-label">備考</label>
+            <textarea className="form-input" rows={3} value={note} onChange={e=>setNote(e.target.value)} placeholder="特記事項があれば入力" />
+          </div>
+          <div className="form-row" style={{display:'flex',alignItems:'center',gap:10}}>
+            <label style={{fontSize:13,fontWeight:600}}>サンプルキット</label>
+            <div className="radio-group" style={{flex:1}}>
+              <div className={`radio-btn${!sampleKit?' selected':''}`} onClick={()=>setSampleKit(false)}>不要</div>
+              <div className={`radio-btn${sampleKit?' selected':''}`} onClick={()=>setSampleKit(true)}>要</div>
+            </div>
+          </div>
+          <div className="btn-group" style={{marginTop:8}}>
+            <button className="btn btn-primary" onClick={handlePrint}>🖨️ PDF保存 / 印刷</button>
+            <button className="btn btn-gray" onClick={onClose}>閉じる</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// メインアプリ
+// ============================================================
+function App() {
+  const [activeTab, setActiveTab] = useState('simulator'); // simulator | price | saves
+  const [mode, setMode] = useState('interior'); // interior | exterior
+  const [area, setArea] = useState('');
+  const [clear, setClear] = useState('none'); // none | gloss | matte
+  const [taxMode, setTaxMode] = useState('ex'); // ex | inc
+  const [overrides, setOverrides] = useState({});
+  const [showManual, setShowManual] = useState(false);
+  const [showPricePanel, setShowPricePanel] = useState(false);
+  const [showOrder, setShowOrder] = useState(false);
+  const [saves, setSaves] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('mw_saves') || '[]'); } catch { return []; }
+  });
+  const [field, setField] = useState({ siteName: '', siteAddr: '', delivDate: '' });
+
+  const areaNum = parseFloat(area) || 0;
+
+  const steps = useMemo(() => {
+    if (areaNum <= 0) return [];
+    return mode === 'interior' ? calcInterior(areaNum, clear) : calcExterior(areaNum, clear);
+  }, [areaNum, mode, clear]);
+
+  const total = useMemo(() => calcTotal(steps, overrides), [steps, overrides]);
+  const displayTotal = taxMode === 'inc' ? Math.round(total * 1.1) : total;
+  const sqmPrice = areaNum > 0 ? Math.round(total / areaNum) : 0;
+
+  const setQty = (key, delta) => {
+    setOverrides(prev => {
+      const baseQty = steps.flatMap(s=>s.rows).find(r=>r.key===key)?.qty || 0;
+      const cur = prev[key] !== undefined ? prev[key] : baseQty;
+      const next = Math.max(0, cur + delta);
+      return { ...prev, [key]: next };
+    });
+  };
+
+  const getQty = (row) => overrides[row.key] !== undefined ? overrides[row.key] : row.qty;
+
+  const handleSave = () => {
+    if (!areaNum) return alert('施工面積を入力してください');
+    const item = {
+      id: Date.now(),
+      mode,
+      area: areaNum,
+      clear,
+      field: { ...field },
+      overrides: { ...overrides },
+      total,
+      date: new Date().toLocaleDateString('ja-JP'),
+      label: field.siteName || `${mode === 'interior' ? '内装' : '外装'} ${areaNum}㎡`,
+    };
+    const next = [item, ...saves].slice(0, 30);
+    setSaves(next);
+    localStorage.setItem('mw_saves', JSON.stringify(next));
+    alert('保存しました');
+  };
+
+  const handleLoad = (item) => {
+    setMode(item.mode);
+    setArea(String(item.area));
+    setClear(item.clear);
+    setField(item.field);
+    setOverrides(item.overrides);
+    setActiveTab('simulator');
+  };
+
+  const handleDelete = (id) => {
+    if (!confirm('この保存データを削除しますか？')) return;
+    const next = saves.filter(s => s.id !== id);
+    setSaves(next);
+    localStorage.setItem('mw_saves', JSON.stringify(next));
+  };
+
+  const handleModeChange = (m) => {
+    setMode(m);
+    setOverrides({});
+  };
+
+  return (
+    <div>
+      {/* ヘッダー */}
+      <div className="header">
+        <h1>🏠 MURA WALL 材料費シミュレーター</h1>
+        <p>Cement Artist Nu☆Man｜株式会社KENSIN</p>
+      </div>
+
+      {/* メインタブ */}
+      <div className="main-tabs no-print">
+        {[['simulator','⚙️ シミュレーター'],['price','💰 単価表'],['saves','📁 保存']].map(([k,l])=>(
+          <button key={k} className={`main-tab${activeTab===k?' active':''}`} onClick={()=>setActiveTab(k)}>{l}</button>
+        ))}
+      </div>
+
+      <div className="content">
+
+        {/* ===== シミュレータータブ ===== */}
+        {activeTab === 'simulator' && (
+          <>
+            {/* 内装/外装切り替え */}
+            <div className="card">
+              <div className="card-title">製品選択</div>
+              <div className="radio-group">
+                <div className={`radio-btn${mode==='interior'?' selected':''}`} onClick={()=>handleModeChange('interior')}>内装 MURA WALL</div>
+                <div className={`radio-btn${mode==='exterior'?' selected':''}`} onClick={()=>handleModeChange('exterior')}>外装 MURA WALL EX</div>
+              </div>
+            </div>
+
+            {/* 現場情報 */}
+            <div className="card">
+              <div className="card-title">現場情報</div>
+              <div className="form-row">
+                <label className="form-label">施工物件名</label>
+                <input className="form-input" value={field.siteName} onChange={e=>setField({...field,siteName:e.target.value})} placeholder="例：○○様邸" />
+              </div>
+              <div className="form-row">
+                <label className="form-label">施工物件住所</label>
+                <input className="form-input" value={field.siteAddr} onChange={e=>setField({...field,siteAddr:e.target.value})} placeholder="例：三重県松阪市" />
+              </div>
+              <div className="form-row">
+                <label className="form-label">希望納期</label>
+                <input className="form-input" type="date" value={field.delivDate} onChange={e=>setField({...field,delivDate:e.target.value})} />
+              </div>
+            </div>
+
+            {/* 施工条件 */}
+            <div className="card">
+              <div className="card-title">施工条件</div>
+              <div className="form-row">
+                <label className="form-label">施工面積</label>
+                <div className="area-input-wrap">
+                  <input className="area-input" type="number" value={area} onChange={e=>{setArea(e.target.value);setOverrides({})}} placeholder="0" min="0" step="0.5" />
+                  <span className="area-unit">㎡</span>
+                </div>
+              </div>
+              <div className="form-row">
+                <label className="form-label">クリヤー仕上げ（オプション）</label>
+                <div className="radio-group">
+                  {[['none','なし'],['gloss','艶あり'],['matte','艶消し']].map(([k,l])=>(
+                    <div key={k} className={`radio-btn${clear===k?' selected':''}`} onClick={()=>setClear(k)}>{l}</div>
+                  ))}
+                </div>
+                {clear !== 'none' && mode === 'interior' && (
+                  <div className="warn-banner">
+                    <span className="icon">⚠️</span>
+                    <span>内装にクリヤーを使用すると<strong>国土交通大臣認定防火材料の対象外</strong>になります。ご注意ください。</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* 計算結果 */}
+            {areaNum > 0 && steps.length > 0 && (
+              <>
+                <div className="card">
+                  <div className="card-title">材料リスト（手動調整可）</div>
+                  {steps.map((step, si) => (
+                    <div className="result-step" key={si}>
+                      <div className="result-step-title">{step.title}</div>
+                      {step.rows.map((row, ri) => {
+                        const qty = getQty(row);
+                        return (
+                          <div className="result-row" key={ri}>
+                            <div className="result-name">{row.mat.name}<br/><span style={{fontSize:11,color:'#999'}}>{row.mat.size}</span></div>
+                            <div className="qty-adjust">
+                              <button className="qty-btn" onClick={()=>setQty(row.key, -1)}>−</button>
+                              <span className="qty-num">{qty}</span>
+                              <button className="qty-btn" onClick={()=>setQty(row.key, 1)}>+</button>
+                              <span style={{fontSize:12,color:'#999',marginLeft:2}}>{row.mat.unit}</span>
+                            </div>
+                            <div className="result-price">¥{fmt(row.mat.price * qty)}</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
+
+                {/* 合計 */}
+                <div className="total-box no-print">
+                  <div className="total-tax-toggle">
+                    <button className={`tax-btn${taxMode==='ex'?' active':''}`} onClick={()=>setTaxMode('ex')}>税抜</button>
+                    <button className={`tax-btn${taxMode==='inc'?' active':''}`} onClick={()=>setTaxMode('inc')}>税込（10%）</button>
+                  </div>
+                  <div className="total-row">
+                    <span className="total-label">合計金額</span>
+                    <span className="total-main">¥{fmt(displayTotal)}</span>
+                  </div>
+                  <div className="sqm-price">㎡単価（税抜）：¥{fmt(sqmPrice)}/㎡　｜　施工面積：{areaNum}㎡</div>
+                </div>
+
+                {/* ボタン群 */}
+                <div className="btn-group no-print">
+                  <button className="btn btn-primary" onClick={()=>setShowOrder(true)}>📋 発注書を発行</button>
+                  <button className="btn btn-secondary" onClick={handleSave}>💾 保存</button>
+                </div>
+                <div className="btn-group no-print">
+                  <button className="btn btn-gray" onClick={()=>{
+                    const lines = steps.flatMap(s=>[s.title,...s.rows.map(r=>`  ${r.mat.name}（${r.mat.size}）× ${getQty(r)}${r.mat.unit}　¥${fmt(r.mat.price*getQty(r))}`)]);
+                    lines.push(`\n合計（税抜）：¥${fmt(total)}`);
+                    navigator.clipboard.writeText(lines.join('\n'));
+                    alert('コピーしました');
+                  }}>📋 テキストコピー</button>
+                </div>
+              </>
+            )}
+
+            {/* 施工要領 */}
+            <div className="collapse-panel no-print">
+              <div className="collapse-header" onClick={()=>setShowManual(!showManual)}>
+                📖 施工要領を確認する
+                <span className={`arrow${showManual?' open':''}`}>▼</span>
+              </div>
+              {showManual && <div className="collapse-body"><ManualPanel mode={mode} /></div>}
+            </div>
+          </>
+        )}
+
+        {/* ===== 単価表タブ ===== */}
+        {activeTab === 'price' && (
+          <div className="card">
+            <div className="card-title">材料単価表（全材料）</div>
+            <PriceTablePanel />
+            <div style={{fontSize:11,color:'#aaa',marginTop:10}}>※ 価格は税抜。㎡単価は標準施工面積の中央値で算出。</div>
+          </div>
+        )}
+
+        {/* ===== 保存タブ ===== */}
+        {activeTab === 'saves' && (
+          <div className="card">
+            <div className="card-title">保存済み現場（{saves.length}件）</div>
+            {saves.length === 0 ? (
+              <div className="empty-state">
+                <div className="icon">📭</div>
+                <div>保存済みのデータはありません</div>
+                <div style={{fontSize:12,marginTop:4}}>シミュレーター画面で「保存」ボタンを押してください</div>
+              </div>
+            ) : (
+              <div className="save-list">
+                {saves.map(item => (
+                  <div className="save-item" key={item.id}>
+                    <div className="save-item-info">
+                      <div className="save-item-name">{item.label}</div>
+                      <div className="save-item-meta">
+                        {item.mode === 'interior' ? '内装' : '外装'} / {item.area}㎡ / 合計¥{fmt(item.total)} / {item.date}
+                      </div>
+                    </div>
+                    <div className="save-item-actions">
+                      <button className="icon-btn" onClick={()=>handleLoad(item)}>読込</button>
+                      <button className="icon-btn danger" onClick={()=>handleDelete(item.id)}>削除</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+      </div>
+
+      {/* 発注書モーダル */}
+      {showOrder && (
+        <OrderModal
+          mode={mode}
+          steps={steps}
+          overrides={overrides}
+          field={field}
+          onClose={()=>setShowOrder(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
